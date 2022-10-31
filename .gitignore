@@ -1,3 +1,7 @@
 /dist
 /node_modules
 /setup.json
+/assets
+*log
+*audit.json
+.DS_Store

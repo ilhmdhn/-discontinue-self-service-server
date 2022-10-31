@@ -1,5 +1,7 @@
 const sql = require('mssql');
 const fs = require('fs');
+const express = require('express')
+const app = express();
 
 const setup = JSON.parse(fs.readFileSync('setup.json'));
 
@@ -24,13 +26,14 @@ const dbConnection = async() =>{
         try{
             const appPool = new sql.ConnectionPool(sqlConfig)
             appPool.connect().then(function(pool) {
+                app.locals.db = pool;
                 const connectionStatus = {
-                    "Connected": pool._connected,
-                    "Connecting": pool._connecting,
-                    "Database Server": pool.config.database,
-                    "Connected": pool.config.server,
+                    "Connected Status": pool._connected,
+                    "Is Connecting?": pool._connecting,
+                    "Database Name": pool.config.database,
+                    "Database Server IP": pool.config.server,
                 }
-                console.info("jsonnya "+ connectionStatus)
+                appPool.close()
                 resolve(connectionStatus)
             }).catch(function(err) {
                 resolve('Error creating connection pool', err)
@@ -43,5 +46,6 @@ const dbConnection = async() =>{
 }
 
 module.exports = {
-    dbConnection
+    dbConnection,
+    sqlConfig
 }
