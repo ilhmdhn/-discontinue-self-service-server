@@ -3,6 +3,7 @@ const fs = require('fs');
 const setup = JSON.parse(fs.readFileSync('setup.json'));
 const app = express();
 const {dbConnection} = require("./util/db-connection.js")
+const {createCategoryTable} = require('./util/add-table');
 const logger = require('./util/logger');
 const port = setup.server_port;
 
@@ -19,7 +20,8 @@ const addPoweredHeader = (req, res, next) =>{
     next()
 }
 
-app.listen(port, ()=>{
+app.listen(port, async()=>{
+    await createCategoryTable();
     logger.info(`App running on ${port} port`)
 })
 
