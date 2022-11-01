@@ -1,4 +1,5 @@
-const { app, BrowserWindow, Tray } = require('electron')
+const { app, BrowserWindow, Tray } = require('electron');
+const fs = require('fs');
 const setup = JSON.parse(fs.readFileSync('setup.json'));
 const path = require('path')
 
@@ -21,7 +22,7 @@ function createWindow () {
     
     
       if(error){
-
+        
       }else{
         win.loadURL(`http://localhost:${port}`);
         win.focus();
