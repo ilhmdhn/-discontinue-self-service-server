@@ -1,14 +1,16 @@
 const {categoryRoomData, roomReadyData} = require("../model/room-data")
 const {response} = require('../util/response-format')
 const logger = require('../util/logger');
+const {todayDateNumber} = require('../util/date-utils');
+
 
 const getCategoryRoom = async(req, res)=>{
     try{
         const categoryRoom = await categoryRoomData();
         res.send(categoryRoom)
     }catch(err){
-        logger.error(`Error getCategoryRoom\n${err}\n${err.message}`)
-        res.send(response(false, null, err.message))
+        logger.error(`Error getCategoryRoom\n${err}`)
+        res.send(response(false, null, "Category Room Error"))
     }
 }
 
@@ -22,11 +24,13 @@ const getRoomAvailable = async(req, res) =>{
             return;
         }
 
-        const roomReady = await roomReadyData(categorySelected)
+        const date = await todayDateNumber();
+
+        const roomReady = await roomReadyData(categorySelected, date);
         res.send(roomReady);
     }catch(err){
-        logger.error(`Error getRoomAvailable\n${err}\n${err.message}`)
-        res.send(response(false, null, err.message))
+        logger.error(`Error getRoomAvailable\n${err}`)
+        res.send(response(false, null, "Error Get Room Data"))
     }
 }
 

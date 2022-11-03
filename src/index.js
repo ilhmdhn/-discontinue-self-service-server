@@ -2,13 +2,16 @@ const express = require("express");
 const fs = require('fs');
 const setup = JSON.parse(fs.readFileSync('setup.json'));
 const app = express();
-const {dbConnection} = require("./util/db-connection.js")
-const {createCategoryTable} = require('./util/add-table');
+const {connectionDbCheck} = require("./util/db-connection.js")
+const {createCategoryTable, addImageUrlColumnIhpInv} = require('./util/add-table');
 const logger = require('./util/logger');
 const port = setup.server_port;
+const path = require("path");
+
 
 const {roomRoute} = require('./router/room-route.js');
-const path = require("path");
+const fnbRoute = require('./router/fnb-route');
+
 
 const loggerRequest = (req, res, next) =>{
     logger.info(`Receive request ${req.method} ${req.originalUrl}`)
@@ -21,15 +24,20 @@ const addPoweredHeader = (req, res, next) =>{
 }
 
 app.listen(port, async()=>{
-    await createCategoryTable();
-    logger.info(`App running on ${port} port`)
+    if(connectionDbCheck.connected != false){
+        await createCategoryTable();
+        await addImageUrlColumnIhpInv();
+        logger.info(`App running on ${port} port`)
+    }else{
+        logger.info(`App running on ${port} port, but connection to database error`)
+    }
 })
 
 app.use(loggerRequest)
 app.use(addPoweredHeader)
 
 app.get('/', async (req, res) =>{
-    const responseData = await dbConnection();
+    const responseData = await connectionDbCheck();
     res.json(responseData);
 });
 
@@ -39,3 +47,4 @@ app.get('/image', (req, res) =>{
 })
 
 app.use(roomRoute)
+app.use(fnbRoute)

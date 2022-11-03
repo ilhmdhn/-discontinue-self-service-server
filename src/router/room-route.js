@@ -4,6 +4,6 @@ const {getCategoryRoom, getRoomAvailable} = require('../controller/room-controll
 const roomRoute = express.Router();
 
 roomRoute.get('/room-category', getCategoryRoom)
-roomRoute.get('/room-available', getRoomAvailable)
+roomRoute.get('/room', getRoomAvailable)
 
 module.exports = {roomRoute};

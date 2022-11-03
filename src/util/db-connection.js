@@ -1,7 +1,8 @@
 const sql = require('mssql');
 const fs = require('fs');
-const express = require('express')
+const express = require('express');
 const app = express();
+const logger = require('../util/logger');
 
 const setup = JSON.parse(fs.readFileSync('setup.json'));
 
@@ -21,31 +22,49 @@ const sqlConfig = {
   }
 }
 
-const dbConnection = async() =>{
-    return new Promise((resolve) =>{
-        try{
-            const appPool = new sql.ConnectionPool(sqlConfig)
-            appPool.connect().then(function(pool) {
-                app.locals.db = pool;
-                const connectionStatus = {
-                    "Connected Status": pool._connected,
-                    "Is Connecting?": pool._connecting,
-                    "Database Name": pool.config.database,
-                    "Database Server IP": pool.config.server,
-                }
-                appPool.close()
-                resolve(connectionStatus)
-            }).catch(function(err) {
-                resolve('Error creating connection pool', err)
-                console('Error creating connection pool '+ err)
-              });  
-        }catch(err){
-            console.log(err.message)
+const connectionDbCheck = () =>{
+  return new Promise((resolve, reject)=>{
+    let connectionStatus = {
+      "connected": false,
+      "database_name": setup.db_name,
+      "database_ip": setup.db_server_ip,
+      "message": ""
+  }
+    try{
+      sql.connect(sqlConfig, err=>{
+        if(err){
+          connectionStatus = {
+            "connected": false,
+            "database_name": setup.db_name,
+            "database_ip": setup.db_server_ip,
+            "message": `Database connection failed \n ${err}`
         }
-    })
+          logger.error(`Error Connect To Database \n ${err}`)
+          resolve(connectionStatus);
+        }else{
+          connectionStatus = {
+            "connected": true,
+            "database_name": setup.db_name,
+            "database_ip": setup.db_server_ip,
+            "message": "Success"
+        }
+        resolve(connectionStatus)
+        }
+      })
+    }catch(err){
+      logger.error(`Error Check Database Connection \n ${err}`)
+      connectionStatus = {
+        "connected": false,
+        "database_name": setup.db_name,
+        "database_ip": setup.db_server_ip,
+        "message": err
+    }
+      resolve(connectionStatus)
+    }
+  });
 }
 
 module.exports = {
-    dbConnection,
-    sqlConfig
+    sqlConfig,
+    connectionDbCheck
 }
