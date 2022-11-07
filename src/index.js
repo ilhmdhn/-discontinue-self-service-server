@@ -3,7 +3,6 @@ const fs = require('fs');
 const setup = JSON.parse(fs.readFileSync('setup.json'));
 const app = express();
 const {connectionDbCheck} = require("./util/db-connection.js")
-const {createCategoryTable, addImageUrlColumnIhpInv, addImageGaleryTable} = require('./util/add-table');
 const logger = require('./util/logger');
 const port = setup.server_port;
 const path = require("path");
@@ -30,7 +29,6 @@ app.listen(port, async()=>{
     if(connectionDbCheck.connected != false){
         await createCategoryTable();
         await addImageUrlColumnIhpInv();
-        await addImageGaleryTable();
         logger.info(`App running on ${port} port`)
     }else{
         logger.info(`App running on ${port} port, but connection to database error`)
@@ -46,7 +44,6 @@ app.get('/', async (req, res) =>{
 });
 
 app.get('/image', (req, res) =>{
-    // res.sendFile(__dirname + '../assets/room/thor.jpg')
     res.sendFile(path.join(__dirname,'../assets/room/thor.jpg'))
 })
 

@@ -53,13 +53,14 @@ const addImageUrlColumnIhpInv = () =>{
     }
 }
 
-const addImageGaleryTable = () =>{
+const addRoomGaleryTable = () =>{
     try{
         const query = `IF NOT EXISTS (SELECT * FROM information_schema.TABLES WHERE TABLE_NAME = 'IHP_Room_gallery') Begin
             CREATE TABLE [dbo].[IHP_Room_Gallery](
                 id int IDENTITY(1,1) PRIMARY KEY,
                 code_room [varchar](10) NOT NULL,
-                image_url [varchar](50)
+                image_url [varchar](50),
+                UNIQUE (image_url)
             )END`
 
             sql.connect(sqlConfig, err =>{
@@ -68,20 +69,20 @@ const addImageGaleryTable = () =>{
                 }else{
                     new sql.Request().query(query, (err, result)=>{
                         if(err){
-                            logger.error(`Error addImageGaleryTable query \n${query}\n${err}`);
+                            logger.error(`Error addRoomGaleryTable query \n${query}\n${err}`);
                         }else{
-                            logger.info('SUCCESS ADD image_gallery TABLE')
+                            logger.info('SUCCESS ADD room_gallery TABLE')
                         }
                     });
                 }
             });
     }catch(err){
-        logger.error(`Error addImageGaleryTable\n${err}`)
+        logger.error(`Error addRoomGaleryTable\n${err}`)
     }
 }
 
 module.exports = {
     createCategoryTable,
     addImageUrlColumnIhpInv,
-    addImageGaleryTable
+    addRoomGaleryTable
 }
