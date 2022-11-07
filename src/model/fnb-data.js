@@ -28,8 +28,7 @@ const categoryFnBData = () =>{
                 }
             });
         }catch(err){
-            logger.error(`Error categoryFnBData Query \n ${query} \n ${err}`)
-            reject(response(false, null, err));
+            reject(`Error categoryFnBData Query \n ${query} \n ${err}`)
         }
     })
 }
@@ -66,8 +65,7 @@ const fnbData = (category, search) =>{
                 }
             })
         }catch(err){
-            logger.error("Error fnbData\n"+err)
-            reject(err)
+            reject("Error fnbData\n"+err);
         }
     })
 }

@@ -9,8 +9,10 @@ const port = setup.server_port;
 const path = require("path");
 
 
+//route
 const {roomRoute} = require('./router/room-route.js');
 const fnbRoute = require('./router/fnb-route');
+const promoRoute = require('./router/promo-route');
 
 
 const loggerRequest = (req, res, next) =>{
@@ -46,5 +48,6 @@ app.get('/image', (req, res) =>{
     res.sendFile(path.join(__dirname,'../assets/room/thor.jpg'))
 })
 
-app.use(roomRoute)
-app.use(fnbRoute)
+app.use(roomRoute);
+app.use(fnbRoute);
+app.use(promoRoute);
