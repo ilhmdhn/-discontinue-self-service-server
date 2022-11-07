@@ -3,7 +3,7 @@ const fs = require('fs');
 const setup = JSON.parse(fs.readFileSync('setup.json'));
 const app = express();
 const {connectionDbCheck} = require("./util/db-connection.js")
-const {createCategoryTable, addImageUrlColumnIhpInv} = require('./util/add-table');
+const {createCategoryTable, addImageUrlColumnIhpInv, addImageGaleryTable} = require('./util/add-table');
 const logger = require('./util/logger');
 const port = setup.server_port;
 const path = require("path");
@@ -13,6 +13,7 @@ const path = require("path");
 const {roomRoute} = require('./router/room-route.js');
 const fnbRoute = require('./router/fnb-route');
 const promoRoute = require('./router/promo-route');
+const imageRoute = require('./router/image-route');
 
 
 const loggerRequest = (req, res, next) =>{
@@ -29,6 +30,7 @@ app.listen(port, async()=>{
     if(connectionDbCheck.connected != false){
         await createCategoryTable();
         await addImageUrlColumnIhpInv();
+        await addImageGaleryTable();
         logger.info(`App running on ${port} port`)
     }else{
         logger.info(`App running on ${port} port, but connection to database error`)
@@ -51,3 +53,4 @@ app.get('/image', (req, res) =>{
 app.use(roomRoute);
 app.use(fnbRoute);
 app.use(promoRoute);
+app.use(imageRoute);
