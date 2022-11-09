@@ -13,6 +13,7 @@ const {roomRoute} = require('./router/room-route.js');
 const fnbRoute = require('./router/fnb-route');
 const promoRoute = require('./router/promo-route');
 const imageRoute = require('./router/image-route');
+const { addStoredProcedureJamKenaSewa } = require("./util/add-table.js");
 
 
 const loggerRequest = (req, res, next) =>{
@@ -29,9 +30,10 @@ app.listen(port, async()=>{
     if(connectionDbCheck.connected != false){
         await createCategoryTable();
         await addImageUrlColumnIhpInv();
-        logger.info(`App running on ${port} port`)
+        await addStoredProcedureJamKenaSewa();
+        logger.info(`App running on ${port} port`);
     }else{
-        logger.info(`App running on ${port} port, but connection to database error`)
+       logger.info(`App running on ${port} port, but connection to database error`);
     }
 })
 

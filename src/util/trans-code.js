@@ -44,13 +44,11 @@ const generateReceptionCode =() =>{
     return new Promise(async (resolve, reject) =>{
         try{
             const initial = await getInitialTransCode();
-            const date = moment().format('YYMMDD')
+            const date = moment().format('YYMMDD');
             let rcp = initial.reception+'-'+date;
             const todayReception = await getTotalReceptionToday(rcp);
             rcp = initial.reception+'-'+date+(todayReception+1).toString().padStart(4, '0');
-
-            console.log(rcp);
-            resolve(rcp)
+            resolve(rcp);
         }catch(err){
             reject(`Error generateReceptionCode\n${err}`)
         }
@@ -80,8 +78,46 @@ const getTotalReceptionToday = (hari)=>{
     })
 }
 
-generateReceptionCode()
+const generateInvoiceCode = () =>{
+    return new Promise(async(resolve, reject)=>{
+        try{
+            const initial = await getInitialTransCode();
+            const date = moment().format('YYMMDD');
+            let ivc = initial.invoice+'-'+date;
+            const todayInvoice = await getTotalInvoiceToday(ivc);
+            ivc = initial.invoice+'-'+date+(todayInvoice+1).toString().padStart(4, '0');
+            resolve(ivc);
+        }catch(err){
+            reject(`Error generateInvoiceCode\n${err}`);
+        }
+    })
+}
+
+const getTotalInvoiceToday = (ivc)=>{
+    return new Promise((resolve, reject)=>{
+        try{
+            const query = `SELECT COUNT(*) as count FROM IHP_Ivc WHERE Invoice LIKE '${ivc}%'`;
+            sql.connect(sqlConfig, err=>{
+                if(err){
+                    reject(`can't connect to database\n{err}`)
+                }else{
+                    new sql.Request().query(query, (err, result)=>{
+                        if(err){
+                            reject(`Error getTotalInvoiceToday query\n${query}\n${err}`)
+                        }else{
+                            resolve(result.recordset[0].count);
+                        }
+                    })
+                }
+            })
+        }catch(err){
+            reject('getTotalInvoiceToday\n'+err);
+        }
+    })
+}
 
 module.exports = {
     getInitialTransCode,
-    generateReceptionCode};
+    generateReceptionCode,
+    generateInvoiceCode
+}
