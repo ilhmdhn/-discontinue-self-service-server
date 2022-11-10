@@ -472,7 +472,8 @@ const insertRcpDetailsRoom = (rcp, room_type, dayNumber, overpax, room_rate, dat
                 }
             })
         }catch(err){
-            logger.error(`Error insertRcpDetailsRoom\n${err}`)
+            logger.error(`Error insertRcpDetailsRoom\n${err}`);
+            resolve(false);
         }
     })
 }

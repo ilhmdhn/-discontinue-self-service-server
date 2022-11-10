@@ -27,7 +27,7 @@ const getInitialTransCode = () =>{
                                             if(result.recordset.length>0){
                                                 resolve(result.recordset[0]);
                                             }else{
-                                                reject(`Config 3 kosong`)
+                                                reject(`Config 3 kosong`);
                                             }
                                         }
                                     });
