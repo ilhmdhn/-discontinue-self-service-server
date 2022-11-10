@@ -7,13 +7,21 @@ const logger = require('./util/logger');
 const port = setup.server_port;
 const path = require("path");
 
+//table
+const {
+    createCategoryTable,
+    addImageUrlColumnIhpInv,
+    addRoomGaleryTable,
+    addStoredProcedureJamKenaSewa,
+    addIHP_Detail_Sewa_KamarTable,
+    removeProcedureJam_Kena_Sewa_
+} = require('./util/add-table');
 
 //route
 const {roomRoute} = require('./router/room-route.js');
 const fnbRoute = require('./router/fnb-route');
 const promoRoute = require('./router/promo-route');
 const imageRoute = require('./router/image-route');
-const { addStoredProcedureJamKenaSewa } = require("./util/add-table.js");
 
 
 const loggerRequest = (req, res, next) =>{
@@ -30,7 +38,12 @@ app.listen(port, async()=>{
     if(connectionDbCheck.connected != false){
         await createCategoryTable();
         await addImageUrlColumnIhpInv();
-        await addStoredProcedureJamKenaSewa();
+        await addIHP_Detail_Sewa_KamarTable();
+        await addRoomGaleryTable();
+        if(await removeProcedureJam_Kena_Sewa_()){
+            addStoredProcedureJamKenaSewa();
+        }
+        
         logger.info(`App running on ${port} port`);
     }else{
        logger.info(`App running on ${port} port, but connection to database error`);

@@ -2,7 +2,7 @@ const sql = require('mssql');
 const {sqlConfig} = require('./db-connection');
 const logger = require('./logger');
 
-const createCategoryTable = () =>{
+const createCategoryTable = async() =>{
     try{
         const query = `IF NOT EXISTS (SELECT * FROM information_schema.TABLES WHERE TABLE_NAME = 'IHP_inventory_category') Begin
                         CREATE TABLE [dbo].[IHP_Inventory_Category](
@@ -28,7 +28,7 @@ const createCategoryTable = () =>{
     }
 }
 
-const addImageUrlColumnIhpInv = () =>{
+const addImageUrlColumnIhpInv = async() =>{
     try{
         const query =  `IF NOT EXISTS(SELECT * FROM information_schema.columns WHERE table_name = 'IHP_Inventory' and column_name = 'image_url')
                         BEGIN
@@ -53,7 +53,7 @@ const addImageUrlColumnIhpInv = () =>{
     }
 }
 
-const addRoomGaleryTable = () =>{
+const addRoomGaleryTable = async() =>{
     try{
         const query = `IF NOT EXISTS (SELECT * FROM information_schema.TABLES WHERE TABLE_NAME = 'IHP_Room_gallery') Begin
             CREATE TABLE [dbo].[IHP_Room_Gallery](
@@ -81,7 +81,7 @@ const addRoomGaleryTable = () =>{
     }
 }
 
-const addStoredProcedureJamKenaSewa = () =>{
+const addStoredProcedureJamKenaSewa = async() =>{
     try{
         const query = `
         CREATE PROCEDURE [dbo].[Jam_Kena_Sewa_] @Type_Room nvarchar(50), @Day nvarchar(1), @Checkin smalldatetime, @Checkout smalldatetime AS 
@@ -526,9 +526,79 @@ const addStoredProcedureJamKenaSewa = () =>{
     }
 }
 
+const addIHP_Detail_Sewa_KamarTable = async() =>{
+   try{
+      
+      const query = `IF NOT EXISTS (SELECT * FROM information_schema.TABLES where TABLE_NAME = 'IHP_Detail_Sewa_Kamar') BEGIN 
+      CREATE TABLE [dbo].[IHP_Detail_Sewa_Kamar]( 
+      [Reception] [nvarchar](20) NULL, 
+      [Kamar] [nvarchar](30) NULL, 
+      [Hari] [smallint] NULL, 
+      [Overpax] [Float] NULL, 
+      [Tarif] [Float] NULL, 
+      [Date_Time_Start] [Datetime] NULL, 
+      [Date_Time_Finish] [Datetime] NULL, 
+      [Menit_Yang_Digunakan] [int] NULL,
+      [Tarif_Kamar_Yang_Digunakan] [Float] NULL, 
+      [Tarif_Overpax_Yang_Digunakan] [Float] NULL 
+      ) 
+      END`;
+
+      sql.connect(sqlConfig, err=>{
+         if(err){
+            logger.error(`can't connect to database\n${err}`);
+         }else{
+            new sql.Request().query(query, (err, result)=>{
+               if(err){
+                  logger.error(`addIHP_Detail_Sewa_KamarTable query \n${query}\n${err}`);
+               }else{
+                  logger.info('SUCCESS AD TABLE IHP_Detail_Sewa_Kamar');
+               }
+            });
+         }
+      })
+ 
+   }catch(err){
+      logger.error('addIHP_Detail_Sewa_KamarTable\n'+err);
+   }
+}
+
+const removeProcedureJam_Kena_Sewa_ = async () =>{
+   return new Promise((resolve)=>{
+      try{
+         const query =
+       `IF EXISTS (SELECT name FROM  sysobjects WHERE name = 'Jam_Kena_Sewa_' AND type = 'P')
+      DROP PROCEDURE Jam_Kena_Sewa_`;
+   
+      sql.connect(sqlConfig, err=>{
+         if(err){
+            logger.error(`can't connect to database\n${err}`);
+            resolve(false);
+         }else{
+            new sql.Request().query(query, (err, result)=>{
+               if(err){
+                  logger.error(`removeProcedureJam_Kena_Sewa_ query \n${query}\n${err}`);
+                  resolve(false);
+               }else{
+                  logger.info('SUCCESS REMOVE Jam_Kena_Sewa_');
+                  resolve(true);
+               }
+            });
+         }
+      })
+
+   }catch(err){
+      resolve(false);
+      logger.error(`removeProcedureJam_Kena_Sewa_\n${err}`);
+   }
+   })
+}
+
 module.exports = {
     createCategoryTable,
     addImageUrlColumnIhpInv,
     addRoomGaleryTable,
-    addStoredProcedureJamKenaSewa
+    addStoredProcedureJamKenaSewa,
+    addIHP_Detail_Sewa_KamarTable,
+    removeProcedureJam_Kena_Sewa_
 }

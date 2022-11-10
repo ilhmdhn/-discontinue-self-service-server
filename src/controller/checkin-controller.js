@@ -1,8 +1,8 @@
 const {response} = require('../util/response-format');
 const logger = require('../util/logger');
 const {getInitialTransCode, generateReceptionCode, generateInvoiceCode} = require('../util/trans-code');
-const {todayMBL} = require('../util/date-utils');
-const {insertRcp, insertRoomCheckin, updateIhpRoom, insertIvc, updateIhpRcpAddInvoice} = require('../model/insert-checkin');
+const {todayMBL, todayDateNumber} = require('../util/date-utils');
+const {insertRcp, insertRoomCheckin, updateIhpRoom, insertIvc, updateIhpRcpAddInvoice, getCheckinAndCheckoutTime, getRateRoomHourly, insertRcpDetailsRoom, countRoomRate} = require('../model/insert-checkin');
 
 const postCheckinRoom = async(req, res) =>{
         try{
@@ -12,7 +12,7 @@ const postCheckinRoom = async(req, res) =>{
             const member_name = 'ILHAM DOHAAN';
             const room_code = 'PR A';
             const room_duration = 3;
-            const room_type = 'ROOM 30';
+            const room_type = 'PR A';
             const pax = '8';
             const chusr = 'SELF';
             const shift = '1';
@@ -31,6 +31,7 @@ const postCheckinRoom = async(req, res) =>{
             const reservation = '';
             const status_promo = 1;
             const invoice_transfer = '';
+            const numberDate = await todayDateNumber();
 
             let isMBL = await todayMBL();
             if(todayMBL){
@@ -87,36 +88,60 @@ const postCheckinRoom = async(req, res) =>{
                 await updateIhpRcpAddInvoice(rcp, ivc);
 
                 if(statusInsertIvc){
-                    const statusInsertRoomCheckin = await insertRoomCheckin(room_code, rcp)
+
+                    // const statusInsertRoomCheckin = await insertRoomCheckin(room_code, rcp)
+                    const statusInsertRoomCheckin = true;
                 
                     if(statusInsertRoomCheckin){
                         const statusUpdateIhpRoom = await updateIhpRoom(room_code, rcp, member_name, pax, room_duration)
                         if(statusUpdateIhpRoom){
-                            //
+                            const timeCheckinAndCheckout = await getCheckinAndCheckoutTime(rcp);
+                            const checkin = timeCheckinAndCheckout[0].checkin;
+                            const checkout = timeCheckinAndCheckout[0].checkout;
+                            const getRateRoomHourlyData = await getRateRoomHourly(room_type, numberDate, checkin, checkout);
+                                if(timeCheckinAndCheckout != false && getRateRoomHourlyData!=false){
+                                    for(let i = 0; i<getRateRoomHourlyData.length; i++){
+                                    let overpax = parseFloat(getRateRoomHourlyData[i].overpax);
+                                    let room_rate = parseFloat(getRateRoomHourlyData[i].tarif);
+                                    await insertRcpDetailsRoom(rcp, room_type, numberDate, overpax, room_rate, getRateRoomHourlyData[i].Time_Start_Dmy, getRateRoomHourlyData[i].Time_Finish_Dmy);
+                                }
+                                await countRoomRate(rcp);
+
+                                
+
+                            }else{
+                                //fail get checkin and checkoutpusextends and get rate room hourly
+                                //remove ihp_rcp, ihp_ivc, ihp_roomCheckin, updateIhpRoom
+                                logger.error('fail get checkin and checkoutpusextends and get rate room hourly');
+                                res.send(response(false, null, 'Fail Checkin'));                                
+                            }
                         }else{
                             //Fail update IHP_Room
                             //remove ihp_rcp, ihp_ivc, ihp_roomCheckin
+                            logger.error('Fail update IHP_Room')
                             res.send(response(false, null, 'Fail Checkin'));                        
                         }
                     }else{
                         //fail IHP_RoomCheckin
                         //remove ihp_rcp, ihp_ivc
+                        logger.error('Fail insert ihp_roomCheckin')
                         res.send(response(false, null, 'Fail Checkin'));
                     }
 
                 }else{
                     //Fail insert ihp_ivc
                     //remove ihp_rcp
+                    logger.error('Fail Insert ihp_ivc')
                     res.send(response(false, null, 'Fail Checkin'));
                 }
             }else{
                 //Fail Insert ihp_rcp
+                logger.error('Fail Insert ihp_rcp')
                 res.send(response(false, null, 'Fail Checkin'));
-                return
             }
 
         }catch(err){
-            logger.error(`Error postCheckinRoom\n${err}`)
+            logger.error(`Error postCheckinRoom\n${err}`);
         }
 }
 
