@@ -1,5 +1,6 @@
 const sql = require("mssql");
 const {sqlConfig} = require('../util/db-connection');
+const logger = require("../util/logger");
 const {response} = require('../util/response-format');
 
 const roomPromoData = () =>{
@@ -36,7 +37,7 @@ const fnbPromoData = () =>{
             
             sql.connect(sqlConfig, err=>{
                 if(err){
-                    reject(`cant't connect to database \n${err}`)
+                    reject(`cant't connect to database \n${err}`);
                 }else{
                     new sql.Request().query(query, (err, result) =>{
                         if(err){
@@ -57,6 +58,87 @@ const fnbPromoData = () =>{
     })
 }
 
+const getPromoFoodData = (name) =>{
+    return new Promise((resolve)=>{
+        try{
+
+            const query =   `SELECT [Promo_Food] as promo_name, 
+                                [Time_Start] as time_start, 
+                                [Time_Finish] as time_finish, 
+                                [Diskon_Persen] as discount_percent, 
+                                [Diskon_Rp] as discount_idr 
+                            FROM IHP_PromoFood
+                            WHERE [Status] = 1 AND [Promo_Food] = '${name}'`
+
+            sql.connect(sqlConfig, err=>{
+                if(err){
+                    logger.error(`cant't connect to database \n${err}`);
+                    resolve(false);
+                }else{
+                    new sql.Request().query(query, (err, result)=>{
+                        if(err){
+                            logger.error(`getPromoFoodData query\n${query}\n${err}`);
+                            resolve(false);
+                        }else{
+                            if(result.recordset.length>0){
+                                logger.info('SUCCESS getPromoFoodData');
+                                resolve(result.recordset[0]);
+                            }else{
+                                logger.info('PROMO DATA FOOD KOSONG '+name);
+                                resolve(false);
+                            }
+                        }
+                    });
+                }
+            });
+        }catch(err){
+            resolve(false);
+        }
+    });
+}
+
+const getPromoRoomData = (name) =>{
+    return new Promise((resolve)=>{
+        try{
+            const query =   `SELECT [Promo_Room] as promo_name, 
+                                [Time_Start] as time_start, 
+                                [Time_Finish] as time_finish, 
+                                [Diskon_Persen] as discount_percent, 
+                                [Diskon_Rp] as discount_idr 
+                            FROM IHP_PromoRoom
+                            WHERE [Status] = 1 AND [Promo_Room] = '${name}'`
+            
+            sql.connect(sqlConfig, err=>{
+                if(err){
+                    logger.error(`cant't connect to database \n${err}`);
+                    resolve(false);
+                }else{
+                    new sql.Request().query(query, (err, result)=>{
+                        if(err){
+                            logger.error(`getPromoFoodData query\n${query}\n${err}`);
+                            resolve(false);
+                        }else{
+                            if(result.recordset.length>0){
+                                logger.info('SUCCESS getPromoFoodData');
+                                resolve(result.recordset[0]);
+                            }else{
+                                logger.info(`PROMO DATA ROOM KOSONG ${name}`);
+                                resolve(false);
+                            }
+                        }
+                    });
+                }
+            });
+        }catch(err){
+            resolve(false);
+            logger.error(`getPromoFoodData\n${err}`);
+        }
+    });
+}
+
 module.exports = {
-    roomPromoData, fnbPromoData
+    roomPromoData, 
+    fnbPromoData,
+    getPromoFoodData,
+    getPromoRoomData
 }

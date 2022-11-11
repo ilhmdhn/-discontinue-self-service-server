@@ -6,6 +6,7 @@ const {connectionDbCheck} = require("./util/db-connection.js")
 const logger = require('./util/logger');
 const port = setup.server_port;
 const path = require("path");
+const bodyParser = require('body-parser');
 
 //table
 const {
@@ -22,6 +23,7 @@ const {roomRoute} = require('./router/room-route.js');
 const fnbRoute = require('./router/fnb-route');
 const promoRoute = require('./router/promo-route');
 const imageRoute = require('./router/image-route');
+const checkinRoute = require('./router/checkin-route');
 
 
 const loggerRequest = (req, res, next) =>{
@@ -52,17 +54,17 @@ app.listen(port, async()=>{
 
 app.use(loggerRequest)
 app.use(addPoweredHeader)
+app.use(bodyParser.json());
+app.use(bodyParser.raw());
+app.use(bodyParser.urlencoded({extended: true}));
 
 app.get('/', async (req, res) =>{
     const responseData = await connectionDbCheck();
     res.json(responseData);
 });
 
-app.get('/image', (req, res) =>{
-    res.sendFile(path.join(__dirname,'../assets/room/thor.jpg'))
-})
-
 app.use(roomRoute);
 app.use(fnbRoute);
 app.use(promoRoute);
 app.use(imageRoute);
+app.use(checkinRoute);

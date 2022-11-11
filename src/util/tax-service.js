@@ -19,7 +19,7 @@ const taxService = () =>{
                     logger.error(`can't connect to database\n ${err}`);
                     resolve(false);
                 }else{
-                    sql.Request().query(query, (err, result)=>{
+                    new sql.Request().query(query, (err, result)=>{
                         if(err){
                             logger.error(`taxService query\n${query}\n${err}`);
                             resolve(false);

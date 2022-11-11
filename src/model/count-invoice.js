@@ -26,9 +26,12 @@ const countInvoice = (rcp) =>{
 
             roomDiscount = discountRoomRateIdr + (discountRoomRatePercent * roomRate);
             roomOverpax = roomOverpax - (roomOverpax * discountRoomRatePercent);
-
-            const taxRoom = await taxService(rcp).room_tax*(roomRate-roomDiscount);
-            const serviceRoom = await taxService(rcp).room_percent_service*(roomRate-roomDiscount);
+            let taxRoom = await taxService(rcp);
+            let serviceRoom = await taxService(rcp);
+            taxRoom = (taxRoom.room_tax/100) * (roomRate-roomDiscount);
+            serviceRoom = (serviceRoom.room_percent_service/100) * (roomRate-roomDiscount);
+            
+            console.log(`tax ${taxRoom} service ${serviceRoom}`);
             const fixRoomRate = roomRate + taxRoom + serviceRoom - roomDiscount-downPayment-voucherIdr;
 
             /*

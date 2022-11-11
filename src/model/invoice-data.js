@@ -46,7 +46,7 @@ const getRoomPromo = (rcp) =>{
                 if(err){
                     logger.error(`can't connect to database${err}`);
                 }else{
-                    sql.Request().query(query, (err, result)=>{
+                    new sql.Request().query(query, (err, result)=>{
                         if(err){
                             logger.error(`getRoomPromo query\n${query}\n${err}`);
                         }else{
@@ -72,7 +72,7 @@ const ihpInvoiceUpdateData = (ivcData) =>{
         try{
             const query = `
             UPDATE IHP_Ivc SET
-                ,[Sewa_Kamar] = ${ivcData.Sewa_Kamar}
+                [Sewa_Kamar] = ${ivcData.Sewa_Kamar}
                 ,[Total_Extend] = ${ivcData.Total_Extend}
                 ,[Overpax] = ${ivcData.Overpax}
                 ,[Discount_Kamar] = ${ivcData.Discount_Kamar}

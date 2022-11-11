@@ -602,6 +602,90 @@ const countRoomRate = (rcp) =>{
     });
 }
 
+const insertPromoRcp = (promoData) =>{
+    return new Promise((resolve)=>{
+        try{
+            const query = `
+            INSERT INTO IHP_Promo_Rcp(
+                [Reception]
+                ,[Promo]
+                ,[Start_Promo]
+                ,[End_promo]
+                ,[Status_Promo]
+                ,[Syarat_Kamar]
+                ,[Kamar]
+                ,[Syarat_Jenis_kamar]
+                ,[Jenis_Kamar]
+                ,[Syarat_Durasi]
+                ,[Durasi]
+                ,[Syarat_Hari]
+                ,[Hari]
+                ,[Syarat_Jam]
+                ,[Date_Start]
+                ,[Time_Start]
+                ,[Date_Finish]
+                ,[Time_Finish]
+                ,[Syarat_Quantity]
+                ,[Quantity]
+                ,[Diskon_Persen]
+                ,[Diskon_Rp]
+                ,[Syarat_Inventory]
+                ,[Inventory]
+                ,[Sign_Inventory]
+                ,[Sign_Diskon_Persen]
+                ,[Sign_Diskon_Rp]
+                ,[FlagExtend])
+            VALUES(
+                 '${promoData.rcp}'
+                ,'${promoData.promo_name}'
+                ,getdate()
+                ,DATEADD(hour, ${promoData.duration}, getdate())
+                ,${promoData.promo_type}
+                ,0
+                ,''
+                ,0
+                ,''
+                ,0
+                ,0
+                ,0
+                ,0
+                ,0
+                ,0
+                ,'${promoData.time_start}'
+                ,1
+                ,'${promoData.time_finish}'
+                ,0
+                ,0
+                ,${promoData.discount_percent}
+                ,${promoData.discount_idr}
+                ,0
+                ,''
+                ,0
+                ,0
+                ,0
+                ,0
+                )
+            `
+            sql.connect(sqlConfig, err =>{
+                if(err){
+                    logger.error(`cant't connect to database \n${err}`);
+                    resolve(false);   
+                }else{
+                    new sql.Request().query(query, (err, result)=>{
+                        if(err){
+                            logger.error(`insertPromoRcp query\n${query}\n${err}`);
+                        }else{
+                            resolve(true)
+                        }
+                    });
+                }
+            })
+        }catch(err){
+            logger.error(`insertPromoRcp \n${err}`);
+        }
+    });
+}
+
 module.exports = { 
     insertRcp,
     insertIvc,
@@ -611,5 +695,6 @@ module.exports = {
     getCheckinAndCheckoutTime,
     getRateRoomHourly,
     insertRcpDetailsRoom,
-    countRoomRate
+    countRoomRate,
+    insertPromoRcp
 }
