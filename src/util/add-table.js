@@ -2,7 +2,7 @@ const sql = require('mssql');
 const {sqlConfig} = require('./db-connection');
 const logger = require('./logger');
 
-const createCategoryTable = async() =>{
+const createCategoryTable = () =>{
     try{
         const query = `IF NOT EXISTS (SELECT * FROM information_schema.TABLES WHERE TABLE_NAME = 'IHP_inventory_category') Begin
                         CREATE TABLE [dbo].[IHP_Inventory_Category](
@@ -28,7 +28,7 @@ const createCategoryTable = async() =>{
     }
 }
 
-const addImageUrlColumnIhpInv = async() =>{
+const addImageUrlColumnIhpInv = () =>{
     try{
         const query =  `IF NOT EXISTS(SELECT * FROM information_schema.columns WHERE table_name = 'IHP_Inventory' and column_name = 'image_url')
                         BEGIN
@@ -53,7 +53,7 @@ const addImageUrlColumnIhpInv = async() =>{
     }
 }
 
-const addRoomGaleryTable = async() =>{
+const addRoomGaleryTable = () =>{
     try{
         const query = `IF NOT EXISTS (SELECT * FROM information_schema.TABLES WHERE TABLE_NAME = 'IHP_Room_gallery') Begin
             CREATE TABLE [dbo].[IHP_Room_Gallery](
@@ -81,7 +81,7 @@ const addRoomGaleryTable = async() =>{
     }
 }
 
-const addStoredProcedureJamKenaSewa = async() =>{
+const addStoredProcedureJamKenaSewa = () =>{
     try{
         const query = `
         CREATE PROCEDURE [dbo].[Jam_Kena_Sewa_] @Type_Room nvarchar(50), @Day nvarchar(1), @Checkin smalldatetime, @Checkout smalldatetime AS 
@@ -526,7 +526,7 @@ const addStoredProcedureJamKenaSewa = async() =>{
     }
 }
 
-const addIHP_Detail_Sewa_KamarTable = async() =>{
+const addIHP_Detail_Sewa_KamarTable = () =>{
    try{
       
       const query = `IF NOT EXISTS (SELECT * FROM information_schema.TABLES where TABLE_NAME = 'IHP_Detail_Sewa_Kamar') BEGIN 
@@ -563,7 +563,7 @@ const addIHP_Detail_Sewa_KamarTable = async() =>{
    }
 }
 
-const removeProcedureJam_Kena_Sewa_ = async () =>{
+const removeProcedureJam_Kena_Sewa_ = () =>{
    return new Promise((resolve)=>{
       try{
          const query =
@@ -594,11 +594,63 @@ const removeProcedureJam_Kena_Sewa_ = async () =>{
    })
 }
 
+const addSewa_Kamar_Sebelum_DiskonColumnOnIHP_IvcTable = () =>{
+   try{
+      const query = `
+      IF NOT EXISTS (SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IHP_Ivc' AND COLUMN_NAME ='Sewa_Kamar_Sebelum_Diskon')
+      BEGIN
+         ALTER TABLE IHP_Ivc ADD Sewa_Kamar_Sebelum_Diskon [float] NULL
+      END
+      `
+      sql.connect(sqlConfig, err=>{
+         if(err){
+            logger.error(`can't connect to database\n${err}`);
+         }else{
+            new sql.Request().query(query, (err, result)=>{
+               if(err){
+                  logger.error(`addSewa_Kamar_Sebelum_DiskonColumnOnIHP_IvcTable query \n${query}\n${err}`);
+               }else{
+                  logger.info('SUCCESS ADD Sewa_Kamar_Sebelum_Diskon COLUMN');
+               }
+            });
+         }
+      });
+   }catch(err){
+      logger.error(`addSewa_Kamar_Sebelum_DiskonColumnOnIHP_IvcTable\n${err}`);
+   }
+}
+
+const addDiskon_Sewa_KamarOnIHP_IvcTable = () =>{
+   try{
+      const query = `IF NOT EXISTS (SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IHP_Ivc' AND COLUMN_NAME ='Diskon_Sewa_Kamar')
+      BEGIN
+      ALTER TABLE IHP_Ivc ADD Diskon_Sewa_Kamar [float] NULL
+      END`
+
+      sql.connect(sqlConfig, err=>{
+         if(err){
+            logger.error(`can't connect to database\n${err}`);
+         }else{
+            new sql.Request().query(query, (err, result)=>{
+               if(err){
+                  logger.error(`addDiskon_Sewa_KamarOnIHP_IvcTable query \n${query}\n${err}`);
+               }else{
+                  logger.info('SUCCESS ADD Diskon_Sewa_Kamar COLUMN');
+               }
+            });
+         }
+      });
+   }catch(err){
+      logger.error(`addDiskon_Sewa_KamarOnIHP_IvcTable\n${err}`);
+   }
+}
 module.exports = {
     createCategoryTable,
     addImageUrlColumnIhpInv,
     addRoomGaleryTable,
     addStoredProcedureJamKenaSewa,
     addIHP_Detail_Sewa_KamarTable,
-    removeProcedureJam_Kena_Sewa_
+    removeProcedureJam_Kena_Sewa_,
+    addSewa_Kamar_Sebelum_DiskonColumnOnIHP_IvcTable,
+    addDiskon_Sewa_KamarOnIHP_IvcTable
 }

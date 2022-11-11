@@ -64,8 +64,6 @@ const postCheckinRoom = async(req, res) =>{
                 isMBL = 2;
             }
 
-//            console.log(`promonya \nstatus promo: ${status_promo}\nstatus promo fnb: ${promo_fnb_state}\nstatus promo room: ${promo_room_state}\nroom promo: ${promo_room_name}\nfood promo: ${promo_fnb_name}`);
-
             const rcpData ={
                 reception: rcp,
                 member: member_code,
