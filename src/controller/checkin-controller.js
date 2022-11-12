@@ -131,54 +131,56 @@ const postCheckinRoom = async(req, res) =>{
 
                                 const countRoomRateStatus = await countRoomRate(rcp);
 
-                                if(status_promo == "2"){
-                                    if(promo_room_state){
-                                        const dataPromoRoom = await getPromoRoomData(promo_room_name);
-                                        if(dataPromoRoom != false){
-                                            const promoData = {
-                                                rcp: rcp,
-                                                promo_name: dataPromoRoom.promo_name,
-                                                duration: room_duration,
-                                                promo_type: 1,
-                                                time_start: dataPromoRoom.time_start,
-                                                time_finish: dataPromoRoom.time_finish,
-                                                discount_percent: dataPromoRoom.discount_percent,
-                                                discount_idr: dataPromoRoom.discount_idr
-                                                }
-                                            await insertPromoRcp(promoData);
+                                if(countRoomRateStatus != false){
+                                    if(status_promo == "2"){
+                                        if(promo_room_state){
+                                            const dataPromoRoom = await getPromoRoomData(promo_room_name);
+                                            if(dataPromoRoom != false){
+                                                const promoData = {
+                                                    rcp: rcp,
+                                                    promo_name: dataPromoRoom.promo_name,
+                                                    duration: room_duration,
+                                                    promo_type: 1,
+                                                    time_start: dataPromoRoom.time_start,
+                                                    time_finish: dataPromoRoom.time_finish,
+                                                    discount_percent: dataPromoRoom.discount_percent,
+                                                    discount_idr: dataPromoRoom.discount_idr
+                                                    }
+                                                await insertPromoRcp(promoData);
+                                            }
+                                        }
+                                        if(promo_fnb_state){
+                                            const dataPromoFnB = await getPromoFoodData(promo_fnb_name);
+                                            if(dataPromoFnB != false){
+                                                const promoData = {
+                                                    rcp: rcp,
+                                                    promo_name: dataPromoFnB.promo_name,
+                                                    duration: room_duration,
+                                                    promo_type: 2,
+                                                    time_start: dataPromoFnB.time_start,
+                                                    time_finish: dataPromoFnB.time_finish,
+                                                    discount_percent: dataPromoFnB.discount_percent,
+                                                    discount_idr: dataPromoFnB.discount_idr
+                                                    }
+                                                await insertPromoRcp(promoData);
+                                            }
                                         }
                                     }
-                                    if(promo_fnb_state){
-                                        const dataPromoFnB = await getPromoFoodData(promo_fnb_name);
-                                        if(dataPromoFnB != false){
-                                            const promoData = {
-                                                rcp: rcp,
-                                                promo_name: dataPromoFnB.promo_name,
-                                                duration: room_duration,
-                                                promo_type: 2,
-                                                time_start: dataPromoFnB.time_start,
-                                                time_finish: dataPromoFnB.time_finish,
-                                                discount_percent: dataPromoFnB.discount_percent,
-                                                discount_idr: dataPromoFnB.discount_idr
-                                                }
-                                            await insertPromoRcp(promoData);
+    
+                                    //hitung invoice
+                                    if(countRoomRateStatus){
+                                        const hitungInvoiceStatus = await countInvoice(rcp);
+                                        if(hitungInvoiceStatus){
+                                                res.send(response(true, null, "Checkin Successfully"));
                                         }
-                                    }
-                                }
 
-                                //hitung invoice
-                                if(countRoomRateStatus){
-                                    const hitungInvoiceStatus = await countInvoice(rcp);
-                                    if(hitungInvoiceStatus){
-                                            res.send(response(true, null, "Checkin Successfully"));
+                                    }else{
+                                    //fail insert IHP_Detail_Sewa_Kamar
+                                    //remove ihp_rcp, ihp_ivc, ihp_roomCheckin, updateIhpRoom
+                                    logger.error('fail insert ');
+                                    res.send(response(false, null, 'Fail Checkin'));                                                                    
                                     }
-                                }else{
-                                //fail insert IHP_Detail_Sewa_Kamar
-                                //remove ihp_rcp, ihp_ivc, ihp_roomCheckin, updateIhpRoom
-                                logger.error('fail insert ');
-                                res.send(response(false, null, 'Fail Checkin'));                                                                    
                                 }
-                                
 
                             }else{
                                 //fail get checkin and checkoutpusextends and get rate room hourly
