@@ -62,6 +62,49 @@ return new Promise(async (resolve, reject) =>{
     }});
 }
 
+const generateInvoiceCode = () =>{
+    return new Promise(async(resolve, reject)=>{
+        try{
+            const initial = await getInitialTransCode();
+            const shiftTemp = await getshiftTemp();
+            let date;
+            if(shiftTemp == '3'){
+                date = moment().subtract(1, "days").format("YYMMDD");
+            }else{
+                date = moment().format('YYMMDD');
+            }
+            let ivc = initial.invoice+'-'+date;
+            const todayInvoice = await getTotalInvoiceToday(ivc);
+            ivc = initial.invoice+'-'+date+(todayInvoice+1).toString().padStart(4, '0');
+            resolve(ivc);
+        }catch(err){
+            reject(`Error generateInvoiceCode\n${err}`);
+        }
+    })
+}
+
+const generateSlipOrderCode = () =>{
+    return new Promise( async(resolve) =>{
+        try{
+            const initial = await getInitialTransCode();
+            const shiftTemp = await getshiftTemp();
+            let date;
+            if(shiftTemp == '3'){
+                date = moment().subtract(1, "days").format("YYMMDD");
+            }else{
+                date = moment().format('YYMMDD');
+            }
+            let sol = initial.slipOrder+'-'+date;
+            const todaySlipOrder = await getTotalSolToday(sol);
+            sol = initial.slipOrder+'-'+date+(todaySlipOrder+1).toString().padStart(4,'0');
+            resolve(sol);
+        }catch(err){
+            logger.error(`generateSlipOrderCode ${err}`);
+            resolve(false);
+        }
+    });
+}
+
 const getTotalReceptionToday = (hari)=>{
     return new Promise(async(resolve, reject)=>{
         try{
@@ -85,27 +128,6 @@ const getTotalReceptionToday = (hari)=>{
     })
 }
 
-const generateInvoiceCode = () =>{
-    return new Promise(async(resolve, reject)=>{
-        try{
-            const initial = await getInitialTransCode();
-            const shiftTemp = await getshiftTemp();
-            let date;
-            if(shiftTemp == '3'){
-                date = moment().subtract(1, "days").format("YYMMDD");
-            }else{
-                date = moment().format('YYMMDD');
-            }
-            let ivc = initial.invoice+'-'+date;
-            const todayInvoice = await getTotalInvoiceToday(ivc);
-            ivc = initial.invoice+'-'+date+(todayInvoice+1).toString().padStart(4, '0');
-            resolve(ivc);
-        }catch(err){
-            reject(`Error generateInvoiceCode\n${err}`);
-        }
-    })
-}
-
 const getTotalInvoiceToday = (ivc)=>{
     return new Promise((resolve, reject)=>{
         try{
@@ -120,17 +142,42 @@ const getTotalInvoiceToday = (ivc)=>{
                         }else{
                             resolve(result.recordset[0].count);
                         }
-                    })
+                    });
                 }
-            })
+            });
         }catch(err){
             reject('getTotalInvoiceToday\n'+err);
         }
     })
 }
 
+const getTotalSolToday = (data) =>{
+    return new Promise((resolve) =>{
+        try{
+            const query = `SELECT COUNT(*) as count FROM IHP_Sol WHERE [SlipOrder] LIKE '${data}%'`;
+            sql.connect(sqlConfig, err=>{
+                if(err){
+                    reject(`can't connect to database\n{err}`)
+                }else{
+                    new sql.Request().query(query, (err, result)=>{
+                        if(err){
+                            reject(`Error getTotalSolToday query\n${query}\n${err}`)
+                        }else{
+                            resolve(result.recordset[0].count);
+                        }
+                    });
+                }
+            });
+        }catch(err){
+            logger.error(`getTotalSolToday ${err}`);
+            resolve(false);
+        }
+    });
+}
+
 module.exports = {
     getInitialTransCode,
     generateReceptionCode,
-    generateInvoiceCode
+    generateInvoiceCode,
+    generateSlipOrderCode
 }

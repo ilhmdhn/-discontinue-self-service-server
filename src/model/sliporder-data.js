@@ -146,8 +146,45 @@ const insertSodPromo = (dataSodPromo) =>{
         }
     })
 }
+
+const inventoryData = (id) =>{
+    return new Promise((resolve)=>{
+        try{
+            const query = `
+            SELECT [Nama] as item_name, [Price] as item_price, [Location] as item_location FROM [IHP_Inventory] WHERE [Inventory] = '${id}' AND [Status] = 1
+            `
+
+            sql.connect(sqlConfig, err =>{
+                if(err){
+                    logger.error(`Error Connect To Database \n ${err}`)
+                    resolve(false)
+                }else{
+                    new sql.Request().query(query, (err, result) =>{
+                        if(err){
+                            logger.error(`Error inventoryData Query \n ${query} \n ${err}`)
+                            resolve(false);
+                        }else{
+                            if(result.recordset.length>0){
+                                logger.info(`SUCCESS GET inventoryData ${id}`);
+                                resolve(result.recordset[0]);
+                            }else{
+                                logger.info(`inventoryData ${id} Not Found`);
+                                resolve(false);
+                            }
+                        }
+                    });
+                }
+            });
+        }catch(err){
+            logger.error(`inventoryData ${err}`)
+            resolve(false);
+        }
+    })
+}
+
 module.exports = {
     insertSOL,
     insertSOD,
-    insertSodPromo
+    insertSodPromo,
+    inventoryData
 }

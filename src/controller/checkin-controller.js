@@ -1,12 +1,12 @@
 const {response} = require('../util/response-format');
 const logger = require('../util/logger');
-const {getInitialTransCode, generateReceptionCode, generateInvoiceCode} = require('../util/trans-code');
+const {getInitialTransCode, generateReceptionCode, generateInvoiceCode, generateSlipOrderCode} = require('../util/trans-code');
 const {todayMBL, todayDateNumber, transactionDate} = require('../util/date-utils');
 const {insertRcp, insertRoomCheckin, updateIhpRoom, insertIvc, updateIhpRcpAddInvoice, getCheckinAndCheckoutTime, getRateRoomHourly, insertRcpDetailsRoom, countRoomRate, insertPromoRcp} = require('../model/insert-checkin');
 const {countInvoice} = require('../model/count-invoice');
 const {getPromoRoomData, getPromoFoodData} = require('../model/promo-data');
 const {getshift, getshiftTemp} = require('../util/get-shift');
-const {insertSOL} = require('../model/sliporder-data');
+const {insertSOL, insertSOD, inventoryData} = require('../model/sliporder-data');
 
 const postCheckinRoom = async(req, res) =>{
         try{
@@ -61,7 +61,13 @@ const postCheckinRoom = async(req, res) =>{
             }
 
             //so
+            let order_fnb_status = false;
+            let dataOrder = "";
 
+            if (req.body.fnb_info.state==true){
+                order_fnb_status = true;
+                dataOrder = req.body.fnb_info.data_order;
+            }
 
             const numberDate = await todayDateNumber();
             let isMBL = await todayMBL();
@@ -141,6 +147,7 @@ const postCheckinRoom = async(req, res) =>{
                                 const countRoomRateStatus = await countRoomRate(rcp);
 
                                 if(countRoomRateStatus != false){
+
                                     if(status_promo == "2"){
                                         if(promo_room_state){
                                             const dataPromoRoom = await getPromoRoomData(promo_room_name);
@@ -175,19 +182,46 @@ const postCheckinRoom = async(req, res) =>{
                                             }
                                         }
                                     }
-    
-                                    //hitung invoice
-                                    if(countRoomRateStatus){
+
+                                    if(order_fnb_status == true){
+                                        const solCode = await generateSlipOrderCode();
+                                        const solData = {
+                                            sol_code: solCode,
+                                            shift: shift,
+                                            rcp: rcp,
+                                            room_code: room_code, 
+                                            chusr: chusr,
+                                            date_trans: dateTrans
+                                        }
+
+                                        const insertSolStatus = await insertSOL(solData);
+
+                                        if (insertSolStatus != false){
+                                            for(let i = 0; i<dataOrder.length; i++){
+                                                dataItem = await inventoryData(dataOrder[i].inventory);
+                                                const dataSOD = {
+                                                    sol_code: solCode,
+                                                    inventory: dataOrder[i].inventory,
+                                                    name: dataItem.item_name,
+                                                    price: dataItem.item_price,
+                                                    quantity: dataOrder[i].quantity,
+                                                    location: dataItem.item_location,
+                                                    note: dataOrder[i].notes,
+                                                    chusr: chusr,
+                                                    urut: i
+                                                }
+                                                await insertSOD(dataSOD);
+                                                
+                                            }
+                                        }
+
+
                                         const hitungInvoiceStatus = await countInvoice(rcp);
                                         if(hitungInvoiceStatus){
                                                 res.send(response(true, null, "Checkin Successfully"));
+                                        }else{
+                                                res.send(response(false, null, 'Fail Checkin'));
                                         }
-
-                                    }else{
-                                    //fail insert IHP_Detail_Sewa_Kamar
-                                    //remove ihp_rcp, ihp_ivc, ihp_roomCheckin, updateIhpRoom
-                                    logger.error('fail insert ');
-                                    res.send(response(false, null, 'Fail Checkin'));                                                                    
                                     }
                                 }
 
