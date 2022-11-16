@@ -85,7 +85,7 @@ const insertRcp = (rcpData) =>{
                 '',
                 '',
                 '',
-                GETDATE(),
+                ${rcpData.date_trans},
                 '',
                 ${rcpData.status_promo},
                 '',
@@ -191,7 +191,7 @@ const insertIvc = (ivcData) =>{
                 ,'0'
                 ,''
                 ,''
-                ,getdate()
+                ,${ivcData.date_trans}
                 ,'${ivcData.room_type}'
                 )
                 `

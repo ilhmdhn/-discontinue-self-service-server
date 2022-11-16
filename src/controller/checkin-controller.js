@@ -1,11 +1,12 @@
 const {response} = require('../util/response-format');
 const logger = require('../util/logger');
 const {getInitialTransCode, generateReceptionCode, generateInvoiceCode} = require('../util/trans-code');
-const {todayMBL, todayDateNumber} = require('../util/date-utils');
+const {todayMBL, todayDateNumber, transactionDate} = require('../util/date-utils');
 const {insertRcp, insertRoomCheckin, updateIhpRoom, insertIvc, updateIhpRcpAddInvoice, getCheckinAndCheckoutTime, getRateRoomHourly, insertRcpDetailsRoom, countRoomRate, insertPromoRcp} = require('../model/insert-checkin');
 const {countInvoice} = require('../model/count-invoice');
 const {getPromoRoomData, getPromoFoodData} = require('../model/promo-data');
-
+const {getshift, getshiftTemp} = require('../util/get-shift');
+const {insertSOL} = require('../model/sliporder-data');
 
 const postCheckinRoom = async(req, res) =>{
         try{
@@ -19,7 +20,6 @@ const postCheckinRoom = async(req, res) =>{
             const room_type = req.body.checkin_info.room_type;
             const pax = req.body.checkin_info.pax;
             const chusr = req.body.checkin_info.chusr;
-            const shift = req.body.checkin_info.shift;
             const uang_muka = req.body.checkin_info.uang_muka;
             const QM1 = req.body.checkin_info.QM1;
             const QM2 = req.body.checkin_info.QM2;
@@ -42,6 +42,10 @@ const postCheckinRoom = async(req, res) =>{
             let promo_room_name;
             let promo_fnb_name;
 
+            const shift = await getshift();
+            const shiftTemp = await getshiftTemp();
+            const dateTrans = await transactionDate(shiftTemp);
+
             if(req.body.promo_info.state == true){
                 status_promo = "2"
             }else{
@@ -55,6 +59,9 @@ const postCheckinRoom = async(req, res) =>{
             if(promo_room_state){
                 promo_room_name = req.body.promo_info.promo_room.promo_name;
             }
+
+            //so
+
 
             const numberDate = await todayDateNumber();
             let isMBL = await todayMBL();
@@ -85,6 +92,7 @@ const postCheckinRoom = async(req, res) =>{
                 id_payment: id_payment,
                 uang_voucher: uang_voucher,
                 chusr: chusr,
+                date_trans:dateTrans,
                 MBL: isMBL,
                 reservation: reservation,
                 status_promo: status_promo
@@ -104,6 +112,7 @@ const postCheckinRoom = async(req, res) =>{
                     member_name: member_name,
                     room_code: room_code,
                     uang_muka: uang_muka,
+                    date_trans: dateTrans,
                     invoice_transfer: invoice_transfer,
                     chusr: chusr,
                     room_type:room_type

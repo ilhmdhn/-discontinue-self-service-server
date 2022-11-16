@@ -2,6 +2,7 @@ const sql = require("mssql");
 const {sqlConfig} = require('../util/db-connection');
 const logger = require('../util/logger');
 const moment = require('moment');
+const {getshiftTemp} = require('./get-shift');
 
 const getInitialTransCode = () =>{
     return new Promise((resolve, reject) =>{
@@ -38,21 +39,27 @@ const getInitialTransCode = () =>{
         }
     })
 }
+//untuk mengurangi hari
+//var startdate = moment().subtract(1, "days").format("DD-MM-YYYY");
 
 const generateReceptionCode =() =>{
-
-    return new Promise(async (resolve, reject) =>{
-        try{
+return new Promise(async (resolve, reject) =>{
+    try{
             const initial = await getInitialTransCode();
-            const date = moment().format('YYMMDD');
+            let date;
+            let shiftTemp;
+            if(shiftTemp == '3'){
+                date = moment().subtract(1, "days").format("YYMMDD");
+            }else{
+                date = moment().format('YYMMDD');
+            }
             let rcp = initial.reception+'-'+date;
             const todayReception = await getTotalReceptionToday(rcp);
             rcp = initial.reception+'-'+date+(todayReception+1).toString().padStart(4, '0');
             resolve(rcp);
-        }catch(err){
+    }catch(err){
             reject(`Error generateReceptionCode\n${err}`)
-        }
-    });
+    }});
 }
 
 const getTotalReceptionToday = (hari)=>{
@@ -82,7 +89,13 @@ const generateInvoiceCode = () =>{
     return new Promise(async(resolve, reject)=>{
         try{
             const initial = await getInitialTransCode();
-            const date = moment().format('YYMMDD');
+            const shiftTemp = await getshiftTemp();
+            let date;
+            if(shiftTemp == '3'){
+                date = moment().subtract(1, "days").format("YYMMDD");
+            }else{
+                date = moment().format('YYMMDD');
+            }
             let ivc = initial.invoice+'-'+date;
             const todayInvoice = await getTotalInvoiceToday(ivc);
             ivc = initial.invoice+'-'+date+(todayInvoice+1).toString().padStart(4, '0');

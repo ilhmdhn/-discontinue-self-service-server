@@ -138,9 +138,28 @@ const todayDateNumber = async() =>{
     })
 }
 
+const transactionDate = (shift) =>{
+    return new Promise((resolve)=>{
+        try{
+            let query;
+            if (shift == '1') {
+              query = "getdate()";
+            } else if (shift == '2') {
+              query = "getdate()";
+            } else if (shift == '3') {
+              query = "DATEADD(dd, -1, GETDATE())";
+            }
+            resolve(query);
+        }catch(err){
+            logger.error(`dateTrans \n${err}`)
+        }
+    })
+}
+
 module.exports = {
     todayMBL,
     todayHoliday,
     todayNumber,
-    todayDateNumber
+    todayDateNumber,
+    transactionDate
 }
