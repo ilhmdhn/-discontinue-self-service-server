@@ -155,9 +155,44 @@ const getDownPayment = (rcp) =>{
     });
 }
 
+const getTotalSellingFromSO = (rcp) =>{
+    return new Promise((resolve) =>{
+        try{
+            const query = `
+                SELECT ISNULL(SUM([Total]),0) as total FROM [IHP_Sod] WHERE [SlipOrder] IN (SELECT [SlipOrder] FROM [IHP_Sol] WHERE [Reception] = '${rcp}')
+            `
+            sql.connect(sqlConfig, err=>{
+                if(err){
+                    logger.error(`can't connect to database${err}`);
+                    resolve(false);
+                }else{
+                    new sql.Request().query(query, (err, result)=>{
+                        if(err){
+                            logger.error(`getTotalSellingFromSO query \n${query}\n${err}`);
+                            resolve(false);
+                        }else{
+                            if(result.recordset.length>0){
+                                logger.info('SUCCESS getTotalSellingFromSO');
+                                resolve(result.recordset[0].total);
+                            }else{
+                                logger.error(`getTotalSellingFromSO data empty`);
+                                resolve(false);
+                            }
+                        }
+                    });
+                }
+            });
+        }catch(err){
+            logger.error(`getTotalSellingFromSO\n${err}`);
+            resolve(false);
+        }
+    })
+}
+
 module.exports = {
     getCountRoomRate,
     getRoomPromo,
     ihpInvoiceUpdateData,
-    getDownPayment
+    getDownPayment,
+    getTotalSellingFromSO
 }

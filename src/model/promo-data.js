@@ -61,7 +61,6 @@ const fnbPromoData = () =>{
 const getPromoFoodData = (name) =>{
     return new Promise((resolve)=>{
         try{
-            console.info(`nama promo food ${name}`)
             const query =   `SELECT [Promo_Food] as promo_name, 
                                 [Time_Start] as time_start, 
                                 [Time_Finish] as time_finish, 

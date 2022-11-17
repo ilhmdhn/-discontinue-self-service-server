@@ -1,6 +1,6 @@
 const logger = require('../util/logger');
 const taxService = require('../util/tax-service');
-const {getCountRoomRate, getRoomPromo, ihpInvoiceUpdateData, getDownPayment} = require('./invoice-data');
+const {getCountRoomRate, getRoomPromo, ihpInvoiceUpdateData, getDownPayment, getTotalSellingFromSO} = require('./invoice-data');
 
 const countInvoice = (rcp) =>{
     return new Promise(async(resolve)=>{
@@ -30,17 +30,32 @@ const countInvoice = (rcp) =>{
             let serviceRoom = await taxService(rcp);
             taxRoom = (taxRoom.room_tax/100) * (roomRate-roomDiscount);
             serviceRoom = (serviceRoom.room_percent_service/100) * (roomRate-roomDiscount);
-            
-            console.log(`tax ${taxRoom} service ${serviceRoom}`);
-            const fixRoomRate = roomRate + taxRoom + serviceRoom - roomDiscount-downPayment-voucherIdr;
 
+            const fixRoomRate = roomRate + taxRoom + serviceRoom;
+
+            const chargeSelling = await getTotalSellingFromSO(rcp);
+
+            const taxandService = await taxService(rcp);
+            const taxFnB = (taxandService.food_tax / 100) * chargeSelling;
+            const serviceFnB = (taxandService.food_percent_service / 100) * chargeSelling;
+            const totalSelling = chargeSelling + taxFnB + serviceFnB;
+            
+            const totalAll = fixRoomRate + totalSelling - roomDiscount-downPayment-voucherIdr;
+            
             /*
             Sewa Kamar Sebelum Diskon = roomRate
             Diskon_Sewa_Kamar = roomDiscount
             tax_kamar = taxRoom;
-            Serive_Kamar = serviceRoom
+            Service_Kamar = serviceRoom
+            Charge_Penjualan = chargeSelling
+            Service_Penjualan = serviceFnB
+            Tax_Penjualan = taxFnB
+            Total_Penjualan = totalSelling
             Total_Kamar = fixRoomRate
+            Total_All = totalAll
             */
+
+
 
             const ivcData = {
                     rcp: rcp,
@@ -52,16 +67,16 @@ const countInvoice = (rcp) =>{
                     Service_Kamar: serviceRoom,
                     Tax_Kamar: taxRoom,
                     Total_Kamar: fixRoomRate,
-                    Charge_Penjualan: 0,
+                    Charge_Penjualan: chargeSelling,
                     Total_Cancelation: 0,
                     Discount_Penjualan: 0,
-                    Service_Penjualan: 0,
-                    Tax_Penjualan: 0,
-                    Total_Penjualan: 0,
+                    Service_Penjualan: serviceFnB,
+                    Tax_Penjualan: taxFnB,
+                    Total_Penjualan: totalSelling,
                     Charge_Lain: 0,
                     Uang_Muka: downPayment,
                     Uang_Voucher: voucherIdr,
-                    Total_All: fixRoomRate,
+                    Total_All: totalAll,
                     Total_Extend_Sebelum_Diskon: 0,
                     Diskon_Sewa_Kamar: roomDiscount,
                     Diskon_Extend_Kamar: 0,

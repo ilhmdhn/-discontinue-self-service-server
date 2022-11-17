@@ -7,6 +7,7 @@ const {countInvoice} = require('../model/count-invoice');
 const {getPromoRoomData, getPromoFoodData} = require('../model/promo-data');
 const {getshift, getshiftTemp} = require('../util/get-shift');
 const {insertSOL, insertSOD, inventoryData, insertSodPromo} = require('../model/sliporder-data');
+const {sendSignalAfterCheckinSuccessfully} = require('../util/send-signal');
 
 const postCheckinRoom = async(req, res) =>{
         try{
@@ -44,7 +45,7 @@ const postCheckinRoom = async(req, res) =>{
 
             const shift = await getshift();
             const shiftTemp = await getshiftTemp();
-            const dateTrans = await transactionDate(shiftTemp);            console.log('datetrans '+dateTrans);
+            const dateTrans = await transactionDate(shiftTemp);
 
             if(req.body.promo_info.state == true){
                 status_promo = "2"
@@ -169,6 +170,7 @@ const postCheckinRoom = async(req, res) =>{
                                             const dataPromoFnB = await getPromoFoodData(promo_fnb_name);
                                             if(dataPromoFnB != false){
                                                 const promoData = {
+
                                                     rcp: rcp,
                                                     promo_name: dataPromoFnB.promo_name,
                                                     duration: room_duration,
@@ -206,7 +208,7 @@ const postCheckinRoom = async(req, res) =>{
                                                         sol_code: solCode,
                                                         inventory: dataOrder[i].inventory,
                                                         name: dataItem.item_name,
-                                                        price: dataItem.item_price - (dataItem.item_price*dataPromoFnB.discount_percent),
+                                                        price: dataItem.item_price - (dataItem.item_price*(dataPromoFnB.discount_percent/100)),
                                                         quantity: dataOrder[i].quantity,
                                                         location: dataItem.item_location,
                                                         note: dataOrder[i].notes,
@@ -217,7 +219,7 @@ const postCheckinRoom = async(req, res) =>{
                                                         sol_code: solCode,
                                                         inventory: dataOrder[i].inventory,
                                                         promo_name: promo_fnb_name,
-                                                        price: dataItem.item_price*dataPromoFnB.discount_percent,
+                                                        price: dataItem.item_price*(dataPromoFnB.discount_percent/100),
                                                         quantity: dataOrder[i].quantity,
                                                     }
                                                     await insertSodPromo(dataPromoSod)
@@ -241,6 +243,7 @@ const postCheckinRoom = async(req, res) =>{
 
                                         const hitungInvoiceStatus = await countInvoice(rcp);
                                         if(hitungInvoiceStatus){
+                                               await sendSignalAfterCheckinSuccessfully()
                                                 res.send(response(true, null, "Checkin Successfully"));
                                         }else{
                                                 res.send(response(false, null, 'Fail Checkin'));
