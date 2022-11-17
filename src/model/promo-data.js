@@ -61,12 +61,12 @@ const fnbPromoData = () =>{
 const getPromoFoodData = (name) =>{
     return new Promise((resolve)=>{
         try{
-
+            console.info(`nama promo food ${name}`)
             const query =   `SELECT [Promo_Food] as promo_name, 
                                 [Time_Start] as time_start, 
                                 [Time_Finish] as time_finish, 
-                                [Diskon_Persen] as discount_percent, 
-                                [Diskon_Rp] as discount_idr 
+                                isnull([Diskon_Persen],0) as discount_percent, 
+                                isnull([Diskon_Rp],0) as discount_idr 
                             FROM IHP_PromoFood
                             WHERE [Status] = 1 AND [Promo_Food] = '${name}'`
 
@@ -84,7 +84,7 @@ const getPromoFoodData = (name) =>{
                                 logger.info('SUCCESS getPromoFoodData');
                                 resolve(result.recordset[0]);
                             }else{
-                                logger.info('PROMO DATA FOOD KOSONG '+name);
+                                logger.error('PROMO DATA FOOD KOSONG '+name);
                                 resolve(false);
                             }
                         }

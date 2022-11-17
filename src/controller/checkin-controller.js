@@ -6,7 +6,7 @@ const {insertRcp, insertRoomCheckin, updateIhpRoom, insertIvc, updateIhpRcpAddIn
 const {countInvoice} = require('../model/count-invoice');
 const {getPromoRoomData, getPromoFoodData} = require('../model/promo-data');
 const {getshift, getshiftTemp} = require('../util/get-shift');
-const {insertSOL, insertSOD, inventoryData} = require('../model/sliporder-data');
+const {insertSOL, insertSOD, inventoryData, insertSodPromo} = require('../model/sliporder-data');
 
 const postCheckinRoom = async(req, res) =>{
         try{
@@ -44,7 +44,7 @@ const postCheckinRoom = async(req, res) =>{
 
             const shift = await getshift();
             const shiftTemp = await getshiftTemp();
-            const dateTrans = await transactionDate(shiftTemp);
+            const dateTrans = await transactionDate(shiftTemp);            console.log('datetrans '+dateTrans);
 
             if(req.body.promo_info.state == true){
                 status_promo = "2"
@@ -98,7 +98,7 @@ const postCheckinRoom = async(req, res) =>{
                 id_payment: id_payment,
                 uang_voucher: uang_voucher,
                 chusr: chusr,
-                date_trans:dateTrans,
+                date_trans: dateTrans,
                 MBL: isMBL,
                 reservation: reservation,
                 status_promo: status_promo
@@ -199,19 +199,42 @@ const postCheckinRoom = async(req, res) =>{
                                         if (insertSolStatus != false){
                                             for(let i = 0; i<dataOrder.length; i++){
                                                 dataItem = await inventoryData(dataOrder[i].inventory);
-                                                const dataSOD = {
-                                                    sol_code: solCode,
-                                                    inventory: dataOrder[i].inventory,
-                                                    name: dataItem.item_name,
-                                                    price: dataItem.item_price,
-                                                    quantity: dataOrder[i].quantity,
-                                                    location: dataItem.item_location,
-                                                    note: dataOrder[i].notes,
-                                                    chusr: chusr,
-                                                    urut: i
+                                                let dataSOD;
+                                                if(promo_fnb_state){
+                                                    const dataPromoFnB = await getPromoFoodData(promo_fnb_name);
+                                                    dataSOD = {
+                                                        sol_code: solCode,
+                                                        inventory: dataOrder[i].inventory,
+                                                        name: dataItem.item_name,
+                                                        price: dataItem.item_price - (dataItem.item_price*dataPromoFnB.discount_percent),
+                                                        quantity: dataOrder[i].quantity,
+                                                        location: dataItem.item_location,
+                                                        note: dataOrder[i].notes,
+                                                        chusr: chusr,
+                                                        urut: i
+                                                    }
+                                                    const dataPromoSod={
+                                                        sol_code: solCode,
+                                                        inventory: dataOrder[i].inventory,
+                                                        promo_name: promo_fnb_name,
+                                                        price: dataItem.item_price*dataPromoFnB.discount_percent,
+                                                        quantity: dataOrder[i].quantity,
+                                                    }
+                                                    await insertSodPromo(dataPromoSod)
+                                                }else{
+                                                    dataSOD = {
+                                                        sol_code: solCode,
+                                                        inventory: dataOrder[i].inventory,
+                                                        name: dataItem.item_name,
+                                                        price: dataItem.item_price,
+                                                        quantity: dataOrder[i].quantity,
+                                                        location: dataItem.item_location,
+                                                        note: dataOrder[i].notes,
+                                                        chusr: chusr,
+                                                        urut: i
+                                                    }
                                                 }
                                                 await insertSOD(dataSOD);
-                                                
                                             }
                                         }
 

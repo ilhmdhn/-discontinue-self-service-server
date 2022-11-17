@@ -1,6 +1,5 @@
 const sql = require("mssql");
 const {sqlConfig} = require('../util/db-connection');
-const {response} = require('../util/response-format');
 const logger = require('../util/logger');
 
 const insertSOL = (dataSOL) =>{
@@ -27,7 +26,7 @@ const insertSOL = (dataSOL) =>{
             ,'${dataSOL.room_code}'
             ,'1'
             ,CONVERT(VARCHAR(24),GETDATE(),103) + ' '+ SUBSTRING(CONVERT(VARCHAR(24),GETDATE(),114),1,8)
-            '${dataSOL.chusr}'
+            ,'${dataSOL.chusr}'
             ,'localhost'
             ,${dataSOL.date_trans}
             ,'self service')`;
@@ -119,9 +118,9 @@ const insertSodPromo = (dataSodPromo) =>{
             [Harga_Promo])
             VALUES
             ('${dataSodPromo.sol_code}'
-            '${dataSodPromo.inventory}'
-            '${dataSodPromo.promo_name}'
-            '${parseFloat((dataSodPromo.price * dataSodPromo.quantity))}'
+            ,'${dataSodPromo.inventory}'
+            ,'${dataSodPromo.promo_name}'
+            ,'${parseFloat((dataSodPromo.price * dataSodPromo.quantity))}'
             )`;
 
             sql.connect(sqlConfig, err =>{

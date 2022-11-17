@@ -6,6 +6,7 @@ const getshiftTemp = () =>{
     return new Promise((resolve)=>{
         try{
             const query = `
+            SELECT
             CASE  
                 WHEN CONVERT(varchar, GETDATE(), 108) between [Worktime_Start] AND [Shifttime] THEN 1
                 WHEN CONVERT(varchar(24), GETDATE(), 108) between [Shifttime] AND '23:59:59' THEN 2
@@ -28,10 +29,10 @@ const getshiftTemp = () =>{
                             resolve(false);
                         }else{
                             if(result.recordset.length>0){
+                                resolve(result.recordset[0].shift);
+                            }else{
                                 logger.error('DATA Config 1 tidak lengkap');
                                 resolve(false);
-                            }else{
-                                resolve(result.recordset[0].shift);
                             }
                         }
                     });

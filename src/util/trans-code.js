@@ -96,7 +96,7 @@ const generateSlipOrderCode = () =>{
             }
             let sol = initial.slipOrder+'-'+date;
             const todaySlipOrder = await getTotalSolToday(sol);
-            sol = initial.slipOrder+'-'+date+(todaySlipOrder+1).toString().padStart(4,'0');
+            sol = initial.slipOrder+'-'+date+(todaySlipOrder+1).toString().padStart(5,'0');
             resolve(sol);
         }catch(err){
             logger.error(`generateSlipOrderCode ${err}`);

@@ -141,6 +141,7 @@ const todayDateNumber = async() =>{
 const transactionDate = (shift) =>{
     return new Promise((resolve)=>{
         try{
+            console.log(`shift ${shift}`);
             let query;
             if (shift == '1') {
               query = "getdate()";
