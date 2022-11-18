@@ -41,18 +41,18 @@ const addPoweredHeader = (req, res, next) =>{
 
 app.listen(port, async()=>{
     if(connectionDbCheck.connected != false){
-        createCategoryTable();
-        addImageUrlColumnIhpInv();
-        addIHP_Detail_Sewa_KamarTable();
-        addRoomGaleryTable();
+        await createCategoryTable();
+        await addImageUrlColumnIhpInv();
+        await addIHP_Detail_Sewa_KamarTable();
+        await addRoomGaleryTable();
         if(await removeProcedureJam_Kena_Sewa_()){
             addStoredProcedureJamKenaSewa();
         }
-        addSewa_Kamar_Sebelum_DiskonColumnOnIHP_IvcTable();
-        addDiskon_Sewa_KamarOnIHP_IvcTable();
+        await addSewa_Kamar_Sebelum_DiskonColumnOnIHP_IvcTable();
+        await addDiskon_Sewa_KamarOnIHP_IvcTable();
         logger.info(`App running on ${port} port`);
     }else{
-       logger.info(`App running on ${port} port, but connection to database error`);
+        logger.info(`App running on ${port} port, but connection to database error`);
     }
 })
 

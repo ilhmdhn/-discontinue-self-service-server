@@ -1,20 +1,21 @@
 const dgram = require('dgram');
 const e = require('express');
-const {getIpAndUdpPortAddress} = require('../model/ipport-data');
+const {getIpAndUdpPortAddress, getIpRoom} = require('../model/ipport-data');
 const logger = require('./logger');
 
-const sendSignalAfterCheckinSuccessfully = () =>{
+const sendSignalAfterCheckinSuccessfully = (room_code) =>{
     return new Promise(async(resolve)=>{
         try{
             let getAddress;
             let ipAddress;
             let udpPortAddress;
-            let port;
             let message;
+            let port;
             let messageLength;
 
             const clientPOS = dgram.createSocket('udp4');
             const clientVOD2 = dgram.createSocket('udp4');
+            const clientRoomSign = dgram.createSocket('udp4');
 
             message = "FRONT_OFFICE_ROOM_CHECKIN";
             getAddress = await getIpAndUdpPortAddress("POINT OF SALES");
@@ -36,7 +37,7 @@ const sendSignalAfterCheckinSuccessfully = () =>{
 
 
             message = "TIMER VOD2B";
-            getAddress = await getIpAndUdpPortAddress("POINT OF SALES");
+            getAddress = await getIpAndUdpPortAddress("TIMER VOD2B");
             if (getAddress !== false) {
                 ipAddress = getAddress.ip_address;
                 udpPortAddress = parseInt(getAddress.udp_port_address);
@@ -52,19 +53,22 @@ const sendSignalAfterCheckinSuccessfully = () =>{
                 });
             }
 
-            // var server_udp_room_sign = dgram.createSocket('udp4');
-            // pesan = "Room " + room + " Checkin";
-            // ip_address = await new RoomNoService().getRoomIHPIPAddressRoomNo(db, room);
-            // if ((ip_address !== false)) {
-            //     ip_address = ip_address.recordset[0].IP_Address;
-            //     port = parseInt(7082);
-            //     panjang_pesan = pesan.length;
-            //     panjang_pesan = parseInt(panjang_pesan);
-            //     logger.info("Send Sinyal Checkin to Room Sign " + ip_address);
-            //     server_udp_room_sign.send(pesan, 0, panjang_pesan, port, ip_address, function (err, bytes) {
-            //         server_udp_room_sign.close();
-            //     });
-            // }
+            message = `Room ${room_code} Checkin`;
+            getAddress = await getIpRoom(room_code);
+            if (getAddress !== false) {
+                ipAddress = getAddress.ip_address;
+                udpPortAddress = parseInt(getAddress.udp_port);
+                messageLength = parseInt(message.length);
+                logger.info("Send Sinyal Checkin to Room Sign " + ipAddress);
+                clientRoomSign.send(message, 0, messageLength, port, ip_address, (err, bytes) => {
+                    if(err){
+                        logger.info(`Send Signal Checkin to Room Sign ${ipAddress} ERROR\n${err}`);
+                    }else{
+                        logger.error(`Send Signal Checkin to Room Sign ${ipAddress} SUCCESS}`);
+                        clientRoomSign.close();
+                    }
+                });
+            }
         resolve(true);
         }catch(err){
             logger.info(`sendSignalAfterCheckinSuccessfully ${err}`);

@@ -243,7 +243,7 @@ const postCheckinRoom = async(req, res) =>{
 
                                         const hitungInvoiceStatus = await countInvoice(rcp);
                                         if(hitungInvoiceStatus){
-                                               await sendSignalAfterCheckinSuccessfully()
+                                                await sendSignalAfterCheckinSuccessfully(room_code)
                                                 res.send(response(true, null, "Checkin Successfully"));
                                         }else{
                                                 res.send(response(false, null, 'Fail Checkin'));
