@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron .",
     "pack": "electron-builder --dir",
-    "dist-win": "electron-builder",
+    "build apps": "electron-builder",
     "nodemon": "npx nodemon ./src/index.js"
   },
   "keywords": [
