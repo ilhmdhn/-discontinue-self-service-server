@@ -24,7 +24,7 @@ const sendSignalAfterCheckinSuccessfully = (room_code) =>{
                 ipAddress = getAddress.ip_address;
                 udpPortAddress = parseInt(getAddress.udp_port_address);
                 messageLength = parseInt(message.length);
-                logger.info("Send Sinyal FRONT_OFFICE_ROOM_CHECKIN to POINT OF SALES");
+                logger.info("Send Sinyal FRONT_OFFICE_ROOM_CHECKIN to POINT OF SALES "+ipAddress);
                 clientPOS.send(message, 0, messageLength, udpPortAddress, ipAddress, (err, bytes) => {
                     if(err){
                         logger.error("Send Sinyal FRONT_OFFICE_ROOM_CHECKIN to POINT OF SALES "+err);                        
@@ -42,7 +42,7 @@ const sendSignalAfterCheckinSuccessfully = (room_code) =>{
                 ipAddress = getAddress.ip_address;
                 udpPortAddress = parseInt(getAddress.udp_port_address);
                 messageLength = parseInt(message.length);
-                logger.info("Send Sinyal TIMER VOD2B to TIMER VOD2B");
+                logger.info("Send Sinyal TIMER VOD2B to TIMER VOD2B "+ipAddress);
                 clientVOD2.send(message, 0, messageLength, udpPortAddress, ipAddress, (err, bytes)=> {
                     if(err){
                         logger.error("Send Sinyal TIMER VOD2B to TIMER VOD2B "+err);
@@ -60,7 +60,7 @@ const sendSignalAfterCheckinSuccessfully = (room_code) =>{
                 udpPortAddress = parseInt(getAddress.udp_port);
                 messageLength = parseInt(message.length);
                 logger.info("Send Sinyal Checkin to Room Sign " + ipAddress);
-                clientRoomSign.send(message, 0, messageLength, port, ip_address, (err, bytes) => {
+                clientRoomSign.send(message, 0, messageLength, port, ipAddress, (err, bytes) => {
                     if(err){
                         logger.info(`Send Signal Checkin to Room Sign ${ipAddress} ERROR\n${err}`);
                     }else{

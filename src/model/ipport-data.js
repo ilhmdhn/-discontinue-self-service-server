@@ -62,10 +62,10 @@ const getIpRoom = (room) =>{
                             logger.error(`Error getIpRoom query\n${query}\n${err}`);
                         }else{
                             if(result.recordset.length>0){
-                                logger.info(`SUCCESS IP ROOM Address ${apps}`);
+                                logger.info(`SUCCESS IP ROOM Address ${room}`);
                                 resolve(result.recordset[0]);
                             }else{
-                                logger.error('IP ROOM Not Found '+apps);
+                                logger.error('IP ROOM Not Found '+room);
                                 resolve(false)
                             }
                         }
