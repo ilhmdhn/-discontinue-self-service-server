@@ -9,7 +9,7 @@ const categoryRoomData = () =>{
     return new Promise((resolve, reject)=>{
         try{
 
-            const query = "SELECT DISTINCT [Jenis_Kamar] FROM IHP_Room";
+            const query = "SELECT * FROM IHP_RoomCategory";
 
             sql.connect(sqlConfig, err => {
                 if(err){

@@ -32,7 +32,7 @@ const getAssetsRoomCategory = async(req, res)=>{
         }
 
         const filePath = path.join(__dirname,`../../assets/room_category/${imageName}`);
-        
+        console.info('cul', filePath)
         try {
             await fs.promises.access(filePath);
             res.sendFile(filePath);
