@@ -1,4 +1,4 @@
-const {categoryRoomData, roomReadyData} = require("../model/room-data")
+const {categoryRoomData, roomReadyData, roomDetailData, getRoomGalleryData} = require("../model/room-data")
 const {response} = require('../util/response-format')
 const logger = require('../util/logger');
 const {todayDateNumber} = require('../util/date-utils');
@@ -34,7 +34,32 @@ const getRoomAvailable = async(req, res) =>{
     }
 }
 
+const getDetailRoom = async (req, res) =>{
+    try{
+        const codeRoom = req.query.room_code;
+        if(codeRoom == undefined || codeRoom == null || codeRoom == ''){
+            res.send(response(false, null, "Room Code Empty"));
+            logger.error("Room Category Empty")
+            return;
+        }
+
+        const date = await todayDateNumber();
+        const roomDetail = await roomDetailData(codeRoom, date);
+        const roomGallery = await getRoomGalleryData(codeRoom);
+
+        const roomData = {
+            room_detail: roomDetail,
+            room_gallery: roomGallery
+        }
+        res.send(response(true, roomData));
+    }catch(err){
+        logger.error(`Error getDetailRoom \n${err}`);
+        res.send(response(false, null, 'Server Error'));
+    }
+}
+
 module.exports = {
     getCategoryRoom,
-    getRoomAvailable
+    getRoomAvailable,
+    getDetailRoom
 }
