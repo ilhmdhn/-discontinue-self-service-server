@@ -18,7 +18,8 @@ const {
     removeProcedureJam_Kena_Sewa_,
     addSewa_Kamar_Sebelum_DiskonColumnOnIHP_IvcTable,
     addDiskon_Sewa_KamarOnIHP_IvcTable,
-    addIHP_RoomCategoryTable
+    addIHP_RoomCategoryTable,
+    addRoomImageColumnOnIHP_RoomTable
 } = require('./util/add-table');
 
 //---------------IMPORT ROUTER--------------
@@ -52,6 +53,7 @@ app.listen(port, async()=>{
         await addSewa_Kamar_Sebelum_DiskonColumnOnIHP_IvcTable();
         await addDiskon_Sewa_KamarOnIHP_IvcTable();
         await addIHP_RoomCategoryTable();
+        await addRoomImageColumnOnIHP_RoomTable();
         logger.info(`App running on ${port} port`);
     }else{
         logger.info(`App running on ${port} port, but connection to database error`);

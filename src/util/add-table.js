@@ -722,6 +722,39 @@ const addIHP_RoomCategoryTable = () =>{
       }
    });
 }
+
+const addRoomImageColumnOnIHP_RoomTable = () =>{
+   return new Promise((resolve) =>{
+      try{
+         const query = `
+         IF NOT EXISTS (SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IHP_Room' AND COLUMN_NAME ='room_image')
+         BEGIN
+            ALTER TABLE IHP_Room ADD room_image [varchar] NULL
+         END
+         `
+         sql.connect(sqlConfig, err=>{
+            if(err){
+               logger.error(`can't connect to database\n${err}`);
+               resolve(false);
+            }else{
+               new sql.Request().query(query, (err, result)=>{
+                  if(err){
+                     logger.error(`addRoomImageColumnOnIHP_RoomTable query \n${query}\n${err}`);
+                     resolve(false);
+                  }else{
+                     logger.info('SUCCESS ADD addRoomImageColumnOnIHP_RoomTable COLUMN');
+                     resolve(true);
+                  }
+               });
+            }
+         });
+      }catch(err){
+         logger.error(`addRoomImageColumnOnIHP_RoomTable\n${err}`);
+         resolve(false);
+      } 
+   })
+}
+
 module.exports = {
     createCategoryTable,
     addImageUrlColumnIhpInv,
@@ -731,5 +764,6 @@ module.exports = {
     removeProcedureJam_Kena_Sewa_,
     addSewa_Kamar_Sebelum_DiskonColumnOnIHP_IvcTable,
     addDiskon_Sewa_KamarOnIHP_IvcTable,
-    addIHP_RoomCategoryTable
+    addIHP_RoomCategoryTable,
+    addRoomImageColumnOnIHP_RoomTable
 }
