@@ -1,4 +1,4 @@
-const {categoryFnBData, fnbData} = require('../model/fnb-data');
+const {categoryFnBData, fnbData, fnbDataPaging} = require('../model/fnb-data');
 const {response} = require('../util/response-format');
 const logger = require('../util/logger');
 
@@ -33,7 +33,32 @@ const getFnB = async(req, res)=>{
     }
 }
 
+const getFnBPaging = async (req, res)=>{
+    try{
+        const category = req.query.category;
+        let search = req.query.search;
+        let page = req.query.page;
+        let size = req.query.size;
+        
+        if(search==undefined||search==null){
+            search = ''
+        }
+        
+        if(category == undefined||category == null ||category == ''){
+            res.send(response(false, null, "Category not found"))
+            return
+        }
+
+        const fnb = await fnbDataPaging(category, search.trim(), page, size);
+        res.send(fnb);
+    }catch(err){
+        logger.error('Error getFnB', err)
+        res.send(response(false, null, 'Error get FnB'))
+    }
+}
+
 module.exports = {
     getCategoryFnB,
-    getFnB
+    getFnB,
+    getFnBPaging
 }

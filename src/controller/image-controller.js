@@ -69,7 +69,6 @@ const getAssetsFnB = async(req, res)=>{
 const getAssetsRoom = async(req, res)=>{
     try{
         let imageName = req.query.name_file;
-        console.log('query name '+imageName);
         if(imageName == undefined || imageName == null || imageName == ""){
             imageName = 'default.png';
         }

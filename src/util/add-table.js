@@ -755,39 +755,6 @@ const addRoomImageColumnOnIHP_RoomTable = () =>{
    })
 }
 
-const addIHP_RoomImageTable = () =>{
-   return new Promise((resolve) =>{
-      try{
-         const query = `IF NOT EXISTS (SELECT * FROM information_schema.TABLES where TABLE_NAME = 'IHP_RoomImage') BEGIN 
-         CREATE TABLE [dbo].[IHP_RoomImage](
-         [room_code] [nvarchar](30),
-         [room_image] [nvarchar](30) NULL, 
-         )
-         END`;
-   
-         sql.connect(sqlConfig, err=>{
-            if(err){
-               logger.error(`can't connect to database\n${err}`);
-               resolve(false);
-            }else{
-               new sql.Request().query(query, (err, result)=>{
-                  if(err){
-                     logger.error(`addIHP_RoomImageTable query \n${query}\n${err}`);
-                     resolve(false);
-                  }else{
-                     logger.info('SUCCESS ADD TABLE IHP_RoomImage');
-                     resolve(true);
-                  }
-               });
-            }
-         })
-    
-      }catch(err){
-         logger.error('addIHP_RoomImageTable\n'+err);
-         resolve(false);
-      }
-   });
-}
 
 module.exports = {
     createCategoryTable,
@@ -800,5 +767,4 @@ module.exports = {
     addDiskon_Sewa_KamarOnIHP_IvcTable,
     addIHP_RoomCategoryTable,
     addRoomImageColumnOnIHP_RoomTable,
-    addIHP_RoomImageTable
 }

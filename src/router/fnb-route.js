@@ -1,9 +1,10 @@
 const express = require('express');
-const {getCategoryFnB, getFnB} = require('../controller/fnb-controller');
+const {getCategoryFnB, getFnB, getFnBPaging} = require('../controller/fnb-controller');
 
 const fnbRoute = express.Router();
 
 fnbRoute.get('/fnb-category', getCategoryFnB);
-fnbRoute.get('/fnb', getFnB);
+fnbRoute.get('/fnb-old', getFnB);
+fnbRoute.get('/fnb', getFnBPaging);
 
 module.exports = fnbRoute;

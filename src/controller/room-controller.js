@@ -45,7 +45,13 @@ const getDetailRoom = async (req, res) =>{
 
         const date = await todayDateNumber();
         const roomDetail = await roomDetailData(codeRoom, date);
-        const roomGallery = await getRoomGalleryData(codeRoom);
+        let roomGallery = await getRoomGalleryData(codeRoom);
+        if(roomGallery.length<1){
+            roomGallery = [
+                {
+                    image_url: 'default.png'}
+            ]
+        }
 
         const roomData = {
             room_detail: roomDetail,

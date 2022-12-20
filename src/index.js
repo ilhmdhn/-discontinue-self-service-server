@@ -20,7 +20,6 @@ const {
     addDiskon_Sewa_KamarOnIHP_IvcTable,
     addIHP_RoomCategoryTable,
     addRoomImageColumnOnIHP_RoomTable,
-    addIHP_RoomImageTable
 } = require('./util/add-table');
 
 //---------------IMPORT ROUTER--------------
