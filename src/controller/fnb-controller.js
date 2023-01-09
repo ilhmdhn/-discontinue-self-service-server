@@ -1,4 +1,4 @@
-const {categoryFnBData, fnbData, fnbDataPaging} = require('../model/fnb-data');
+const {categoryFnBData, fnbData, fnbDataPaging, fnbDataById} = require('../model/fnb-data');
 const {response} = require('../util/response-format');
 const logger = require('../util/logger');
 
@@ -56,8 +56,24 @@ const getFnBPaging = async (req, res)=>{
     }
 }
 
+const getFnbById = async(req, res)=>{
+    try{
+        const kode_Inventory = req.query.kode_Inventory;
+
+        if(kode_Inventory == '' || kode_Inventory === null || kode_Inventory === undefined){
+            throw 'kode inventory kosong';
+        }
+
+        const fnbData = await fnbDataById(kode_Inventory);
+        res.send(fnbData)
+    }catch(err){
+        logger.error('Error getFnbById'+ err)
+        res.send(response(false, null, 'Error get FnBById'))
+    }
+}
 module.exports = {
     getCategoryFnB,
     getFnB,
-    getFnBPaging
+    getFnBPaging,
+    getFnbById
 }

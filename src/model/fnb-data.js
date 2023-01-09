@@ -115,8 +115,40 @@ const fnbDataPaging = (category, search, page, size) =>{
     })
 }
 
+const fnbDataById = (inventoryCode) =>{
+    return new Promise((resolve, reject) =>{
+        try{
+            const query = `SELECT [Inventory], [InventoryID_Global], [Nama], [Price], isnull([image_url], 'z') as image, [GROUP]
+                            FROM IHP_Inventory WHERE [Status] = 1 AND [Inventory] = '${inventoryCode}'`
+        
+            sql.connect(sqlConfig, err=>{
+                if(err){
+                    logger.error('Cant connect to database\n'+err)
+                    reject(err)
+                }else{
+                    new sql.Request().query(query, (err, result) =>{
+                        if(err){
+                            logger.error(`Error fnbDataById Query \n ${query}\n${err}`)
+                            reject(err)
+                        }else{
+                            if(result.recordset.length>0){
+                                resolve(response(true, result.recordset[0]))
+                            }else{
+                                resolve(response(false, null, 'Data Kosong'))
+                            }
+                        }
+                    })
+                }
+            })
+        }catch(err){
+            reject("Error fnbDataById\n"+err);
+        }
+    })
+}
+
 module.exports = {
     categoryFnBData,
     fnbData,
-    fnbDataPaging
+    fnbDataPaging,
+    fnbDataById
 }
