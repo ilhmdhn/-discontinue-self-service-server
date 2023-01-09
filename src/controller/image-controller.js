@@ -32,7 +32,6 @@ const getAssetsRoomCategory = async(req, res)=>{
         }
 
         const filePath = path.join(__dirname,`../../assets/room_category/${imageName}`);
-        console.info('cul', filePath)
         try {
             await fs.promises.access(filePath);
             res.sendFile(filePath);
@@ -49,7 +48,7 @@ const getAssetsFnB = async(req, res)=>{
     try{
         let imageName = req.query.name_file;
         if(imageName == undefined || imageName == null || imageName == ""){
-            imageName = 'default.png';
+            imageName = 'default.jpg';
         }
 
         const filePath = path.join(__dirname,`../../assets/fnb/${imageName}`);
@@ -58,7 +57,7 @@ const getAssetsFnB = async(req, res)=>{
             await fs.promises.access(filePath);
             res.sendFile(filePath);
         } catch (error) {
-            res.sendFile(path.join(__dirname,`../../assets/fnb/default.png`));
+            res.sendFile(path.join(__dirname,`../../assets/fnb/default.jpg`));
         }
     }catch(err){
         res.send(response(false, null, "Ada masalah pada server"));

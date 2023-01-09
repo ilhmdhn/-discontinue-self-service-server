@@ -28,6 +28,7 @@ const fnbRoute = require('./router/fnb-route');
 const promoRoute = require('./router/promo-route');
 const imageRoute = require('./router/image-route');
 const checkinRoute = require('./router/checkin-route');
+const memberRoute = require('./router/member-route');
 
 
 //---------------CREATE MIDLEWARE--------------
@@ -78,3 +79,4 @@ app.use(fnbRoute);
 app.use(promoRoute);
 app.use(imageRoute);
 app.use(checkinRoute);
+app.use(memberRoute);

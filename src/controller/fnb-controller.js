@@ -35,7 +35,7 @@ const getFnB = async(req, res)=>{
 
 const getFnBPaging = async (req, res)=>{
     try{
-        const category = req.query.category;
+        let category = req.query.category;
         let search = req.query.search;
         let page = req.query.page;
         let size = req.query.size;
@@ -45,11 +45,10 @@ const getFnBPaging = async (req, res)=>{
         }
         
         if(category == undefined||category == null ||category == ''){
-            res.send(response(false, null, "Category not found"))
-            return
+            category=''
         }
 
-        const fnb = await fnbDataPaging(category, search.trim(), page, size);
+        const fnb = await fnbDataPaging(category.trim(), search.trim(), page, size);
         res.send(fnb);
     }catch(err){
         logger.error('Error getFnB', err)

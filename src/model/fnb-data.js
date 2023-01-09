@@ -75,17 +75,21 @@ const fnbData = (category, search) =>{
 const fnbDataPaging = (category, search, page, size) =>{
     return new Promise((resolve, reject) =>{
         try{
-
             if(search != ''){
                 search = `AND Nama LIKE '${search}%'`
             }
+            if(category != ''){
+                category = `AND [GROUP] = ${category}`
+            }
             const query = `
             SELECT [Inventory], [InventoryID_Global], [Nama], [Price], image, [GROUP]
-            FROM (SELECT ROW_NUMBER() OVER (ORDER BY [Inventory]) as rn, [Inventory], [InventoryID_Global], [Nama], [Price], isnull([image_url], '') as image, [Status], [GROUP] FROM IHP_Inventory WHERE [Status] = 1 AND [GROUP] = ${category} ${search}) as x
+            FROM (SELECT ROW_NUMBER() OVER (ORDER BY [Inventory]) as rn, [Inventory], [InventoryID_Global], [Nama], [Price], isnull([image_url], '') as image, [Status], [GROUP] FROM IHP_Inventory 
+            WHERE [Status] = 1 
+            ${category} 
+            ${search}) as x
             WHERE
             rn BETWEEN ((${page}-1) *${size} +1 ) AND ${page} * ${size}
                 `
-                console.log(query)
             sql.connect(sqlConfig, err=>{
                 if(err){
                     logger.error('Cant connect to database\n'+err)
