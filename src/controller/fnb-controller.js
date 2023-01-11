@@ -58,7 +58,7 @@ const getFnBPaging = async (req, res)=>{
 
 const getFnbById = async(req, res)=>{
     try{
-        const kode_Inventory = req.query.kode_Inventory;
+        const kode_Inventory = req.query.kode_inventory;
 
         if(kode_Inventory == '' || kode_Inventory === null || kode_Inventory === undefined){
             throw 'kode inventory kosong';

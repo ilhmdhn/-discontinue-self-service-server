@@ -6,7 +6,11 @@ const {response} = require('../util/response-format');
 const roomPromoData = () =>{
     return new Promise((resolve, reject) =>{
         try{
-            const query = `SELECT [Promo_Room] as name, isnull([Diskon_Persen], 0) AS discount_percent, isnull([Diskon_Rp],0) as discount_idr FROM IHP_PromoRoom WHERE Time_Start <= CONVERT(varchar,getDate(), 108) AND Time_Finish >= CONVERT(varchar,getDate(), 108) AND Status = 1`
+            const query = `SELECT [Promo_Room] as name, isnull([Diskon_Persen], 0) AS discount_percent, isnull([Diskon_Rp],0) as discount_idr 
+            FROM IHP_PromoRoom 
+            WHERE Time_Start <= CONVERT(varchar,getDate(), 108) 
+            --AND Time_Finish >= CONVERT(varchar,getDate(), 108) 
+            AND Status = 1`
 
             sql.connect(sqlConfig, err=>{
                 if(err){
@@ -33,7 +37,11 @@ const roomPromoData = () =>{
 const fnbPromoData = () =>{
     return new Promise((resolve, reject) =>{
         try{
-            const query = `SELECT [Promo_Food] AS name, isnull([Diskon_Persen], 0) AS discount_percent, isnull([Diskon_Rp],0) AS discount_idr FROM IHP_PromoFood WHERE Time_Start <= CONVERT(varchar,getDate(), 108) AND Time_Finish >= CONVERT(varchar,getDate(), 108) AND Status = 1`
+            const query = `SELECT [Promo_Food] AS name, isnull([Diskon_Persen], 0) AS discount_percent, isnull([Diskon_Rp],0) AS discount_idr FROM IHP_PromoFood 
+            WHERE 
+                Time_Start <= CONVERT(varchar,getDate(), 108) 
+                --AND Time_Finish >= CONVERT(varchar,getDate(), 108) 
+                AND Status = 1`
             
             sql.connect(sqlConfig, err=>{
                 if(err){
