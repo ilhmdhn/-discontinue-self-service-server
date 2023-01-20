@@ -103,7 +103,7 @@ const fnbDataPaging = (category, search, page, size) =>{
                             if(result.recordset.length>0){
                                 resolve(response(true, result.recordset))
                             }else{
-                                resolve(response(false, null, 'Data Kosong'))
+                                resolve(response(true, [], 'Data Kosong'))
                             }
                         }
                     })

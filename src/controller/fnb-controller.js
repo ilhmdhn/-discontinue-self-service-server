@@ -39,6 +39,9 @@ const getFnBPaging = async (req, res)=>{
         let search = req.query.search;
         let page = req.query.page;
         let size = req.query.size;
+        if(page == 0) {
+            page=1   
+        }
         
         if(search==undefined||search==null){
             search = ''

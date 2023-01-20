@@ -48,7 +48,7 @@ const getAllVoucherMembership = async(req, res) =>{
         if(apiResponse.data.state == false){
             throw apiResponse.data.message;
         }
-
+            
         res.send(response(true, apiResponse.data.data));
     }catch(err){
         res.send(response(false, null, err))
