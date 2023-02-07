@@ -15,7 +15,7 @@ const getMemberData = async (req, res) =>{
             return
         }
 
-        const apiResponse = await axios.get(`https://ihp-membership.azurewebsites.net/member-info?member_code=${memberCode}`, {
+        const apiResponse = await axios.get(`http://13.76.167.131:4000/member-info?member_code=${memberCode}`, {
             headers:{
                 'authorization': setup.auth
             },

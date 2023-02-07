@@ -34,7 +34,7 @@ const getAllVoucherMembership = async(req, res) =>{
             return
         }
 
-        const apiResponse = await axios.get(`https://ihp-membership.azurewebsites.net/voucher-all?member_code=${memberCode}`, {
+        const apiResponse = await axios.get(`http://13.76.167.131:4000/voucher-all?member_code=${memberCode}`, {
             headers:{
                 'authorization': setup.auth
             },
