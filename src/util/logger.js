@@ -16,6 +16,7 @@ const logger = winston.createLogger({
             filename: "log_all-%DATE%.log",
             zippedArchive: true,
             datePattern: 'yyyy-MM',
+            json:true,
             maxSize: "3m",
             maxFiles: "30d"
         }),
@@ -23,8 +24,10 @@ const logger = winston.createLogger({
             level: "error",
             filename: "log_error-%DATE%.log",
             zippedArchive: true,
+            json:true,
             datePattern: 'yyyy-MM',
             maxSize: "1m",
+            
             maxFiles: "30d"
         }),
     ]

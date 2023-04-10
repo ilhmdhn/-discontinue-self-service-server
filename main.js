@@ -5,9 +5,9 @@ const logger = require('./src/util/logger');
 
 const port = setup.server_port;
 function createWindow () {
-    app.server = require(__dirname+'/src/index.js', (error)=>{
+    app.server = require(__dirname+'/src/index.js', (err)=>{
       if(err){
-        logger.error(`Fail to open /src/index.js`);
+        logger.error(`Fail to open /src/index.js ${err}`);
       }
     });  
     const win = new BrowserWindow({

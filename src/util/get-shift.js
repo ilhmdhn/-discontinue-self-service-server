@@ -10,7 +10,7 @@ const getshiftTemp = () =>{
             CASE  
                 WHEN CONVERT(varchar, GETDATE(), 108) between [Worktime_Start] AND [Shifttime] THEN 1
                 WHEN CONVERT(varchar(24), GETDATE(), 108) between [Shifttime] AND '23:59:59' THEN 2
-                WHEN CONVERT(varchar(24), GETDATE(), 108) <= [Worktime_Finish] AND [Workdate_Finish] = '3' THEN 3
+                WHEN CONVERT(varchar(24), GETDATE(), 108) <= [Worktime_Finish] AND [Workdate_Finish] = '1' THEN 3
                 ELSE 0
             END 
                 AS shift

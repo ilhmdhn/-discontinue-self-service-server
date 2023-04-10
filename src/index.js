@@ -63,8 +63,8 @@ app.listen(port, async()=>{
 })
 
 //---------------USE MIDLEWARE--------------
-app.use(loggerRequest)
-app.use(addPoweredHeader)
+app.use(loggerRequest);
+app.use(addPoweredHeader);
 app.use(bodyParser.json());
 app.use(bodyParser.raw());
 app.use(bodyParser.urlencoded({extended: true}));
